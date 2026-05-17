@@ -100,12 +100,13 @@ class neuroneAPI(neuronBase) :
                 if time(6,0) <= datetime.now().time() < time(11,0):
                     outInt = 5
                     self._gestGUI.setGUIActive("breef")
+                    texte = self._language.getPhraseMorningBreef("1")
                 elif self._keyword.checkAPI(requette,"actualite") or self._keyword.checkAPI(requette,"meteo"):
                     out = self.__fncBreef.summarizeActuAndMeteo(self._userConf.getLieuDomicile())
                     texte = self._language.getPhraseResumerActu()
                     if out is not None:
                         outInt = 12
-                        self._gestGUI.setGUIActive("resumer",[out,None,outInt])
+                        self._gestGUI.setGUIActive("resumer",[out,None,outInt,texte])
                     else :
                         outInt = 11
                 elif self._keyword.checkAPI(requette,"taches"):
@@ -113,7 +114,7 @@ class neuroneAPI(neuronBase) :
                     texte = self._language.getPhraseResumerTask()
                     if out is not None:
                         outInt = 18
-                        self._gestGUI.setGUIActive("resumer",[None,out,outInt])
+                        self._gestGUI.setGUIActive("resumer",[None,out,outInt,texte])
                     else :
                         outInt = 11
                 else:
@@ -121,12 +122,12 @@ class neuroneAPI(neuronBase) :
                     texte = self._language.getPhraseResumerAll("2")
                     if out is not None:
                         outInt = 19
-                        self._gestGUI.setGUIActive("resumer",[out,None,outInt])
+                        self._gestGUI.setGUIActive("resumer",[out,None,outInt,texte])
                     else :
                         outInt = 20
 
                 if outInt == 12 or outInt == 18 or outInt == 19 or outInt == 5:
-                    self._listSortie = [texte,""]
+                    self._listSortie = ["resumer",""]
                 else :
                     self._listSortie = [self._language.getPhraseResumerAll("1"),""]
                 return outInt

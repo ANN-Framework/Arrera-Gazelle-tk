@@ -1,0 +1,5 @@
+Capacités d'Arrera OPALE - Informations et Résumés :
+
+- Météo et Température : Demander "meteo", "temps qu'il fait", "temperature", "degre". Préciser le moment ("demain matin/après-midi") ou le lieu ("domicile", "travail", "bureau", etc.).
+- Résumés (Breef) : Demander un "resume", "breef" ou "recapitulatif" pour l'actualité ou les tâches.
+- Actualités : Demander "actualites", "infos", "news" pour les dernières nouvelles.

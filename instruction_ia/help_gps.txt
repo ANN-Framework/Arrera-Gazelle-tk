@@ -1,0 +1,6 @@
+Capacités d'Arrera OPALE - GPS et Itinéraire :
+
+- Coordonnées : Demander "gps", "coordonnees geographiques", "position".
+- Lancer un itinéraire : Dire "lance l'itineraire" ou "demarre l'itineraire".
+- Points de l'itinéraire : Dire "je pars de [lieu]" pour le départ, et "je veux arriver a [lieu]" pour la destination.
+- Aide : Demander "aide itineraire".

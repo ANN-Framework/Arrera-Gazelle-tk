@@ -53,7 +53,7 @@ class gestFNC:
         # Fonction de traduction
         self.__traduction = fncTraduction(self.__gestionnaire)
         # Fonction d'orthographe
-        self.__orthographe = fncOrthographe(self.__gestionnaire,"fr")
+        self.__orthographe = fncOrthographe(self.__gestionnaire)
         # Fonction de calculatrice
         self.__calculatrice = fncCalculatrice(self.__gestionnaire)
         # Fonction de code help

@@ -92,7 +92,7 @@ class gestHistorique :
         elif "open_mode" in hist:
             mode = hist.replace("open_mode","").replace(":","").strip()
             if not str("mode" + mode) in listStart and not str("close_mode "+mode) in listAction:
-                print(self.__gestionnaire.getSocketObjet().sendData("launch "+mode))
+                print(self.__gestionnaire.getSocketObjet().send_data_with_clien("launch " + mode))
                 listStart.append("mode" + mode)
         elif "open_project" in hist:
             project = hist.replace("open_project","").replace(":","").strip()

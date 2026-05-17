@@ -1,5 +1,4 @@
-from tkinter import StringVar
-
+from librairy.arrera_tk import *
 from gui.guibase import GuiBase,gestionnaire
 
 class GUIHorloge(GuiBase):
@@ -11,22 +10,19 @@ class GUIHorloge(GuiBase):
         self.__minuteurEnable = False
 
     def _mainframe(self):
-        # Variables
-        self.__varMinute = StringVar(self._screen)
-        self.__varSec = StringVar(self._screen)
         # Conf de la fenetre
         self._screen.grid_rowconfigure(0, weight=0)
         self._screen.grid_rowconfigure(1, weight=1)
         self._screen.grid_columnconfigure(0, weight=1)
         # Frame principal
-        self.__frameNav = self._arrtk.createFrame(self._screen)
-        self.__frameHorloge = self._arrtk.createFrame(self._screen)
-        self.__frameChrono = self._arrtk.createFrame(self._screen)
-        self.__frameMinuteur = self._arrtk.createFrame(self._screen)
+        self.__frameNav = aFrame(self._screen)
+        self.__frameHorloge = aFrame(self._screen)
+        self.__frameChrono = aFrame(self._screen)
+        self.__frameMinuteur = aFrame(self._screen)
 
         # Frame secondaire
-        self.__frameSetMinuteur = self._arrtk.createFrame(self.__frameMinuteur)
-        self.__frameViewMinuteur = self._arrtk.createFrame(self.__frameMinuteur)
+        self.__frameSetMinuteur = aFrame(self.__frameMinuteur)
+        self.__frameViewMinuteur = aFrame(self.__frameMinuteur)
 
         # Conf frame
         self.__frameNav.grid_columnconfigure(0, weight=1)  # espace à gauche
@@ -66,75 +62,45 @@ class GUIHorloge(GuiBase):
 
         # img
         tailleIMG = 30
-        imgHorloge = self._arrtk.createImage(pathDark=self.__assetDirectory+"horloge.png",
-                                             pathLight=self.__assetDirectory+"horloge.png",
-                                             tailleX=tailleIMG,tailleY=tailleIMG)
-        imgChrono = self._arrtk.createImage(pathDark=self.__assetDirectory+"chronometre.png",
-                                             pathLight=self.__assetDirectory+"chronometre.png",
-                                             tailleX=tailleIMG,tailleY=tailleIMG)
-        imgMinuteur = self._arrtk.createImage(pathDark=self.__assetDirectory+"minuteur.png",
-                                             pathLight=self.__assetDirectory+"minuteur.png",
-                                             tailleX=tailleIMG,tailleY=tailleIMG)
+        imgHorloge = aImage(path_dark=self.__assetDirectory+"horloge.png",
+                                             path_light=self.__assetDirectory+"horloge.png",
+                                             width=tailleIMG,height=tailleIMG)
+        imgChrono = aImage(path_dark=self.__assetDirectory+"chronometre.png",
+                                             path_light=self.__assetDirectory+"chronometre.png",
+                                             width=tailleIMG,height=tailleIMG)
+        imgMinuteur = aImage(path_dark=self.__assetDirectory+"minuteur.png",
+                                             path_light=self.__assetDirectory+"minuteur.png",
+                                             width=tailleIMG,height=tailleIMG)
 
         # Widget
         # Nav
-        btnHorloge = self._arrtk.createButton(self.__frameNav,text="",image=imgHorloge,
-                                              command=self.__viewHorloge,
-                                              bg=self._btnColor,fg=self._btnTexteColor,)
-        btnMinuteur = self._arrtk.createButton(self.__frameNav,text="",image=imgMinuteur,
-                                               command=self.__viewMinuteur,
-                                               bg=self._btnColor,fg=self._btnTexteColor,)
-        btnChrono = self._arrtk.createButton(self.__frameNav,text="",image=imgChrono,
-                                             command=self.__viewChrono,
-                                             bg=self._btnColor,fg=self._btnTexteColor,)
+        btnHorloge = aButton(self.__frameNav,text="",image=imgHorloge,
+                                              command=self.__viewHorloge)
+        btnMinuteur = aButton(self.__frameNav,text="",image=imgMinuteur,
+                                               command=self.__viewMinuteur)
+        btnChrono = aButton(self.__frameNav,text="",image=imgChrono,
+                                             command=self.__viewChrono)
         # Horloge
-        self.__labelViewClock = self._arrtk.createLabel(self.__frameHorloge,text="00:00:00",
-                                                        ppolice="Arial",ptaille=60,pstyle="bold")
+        self.__labelViewClock = aLabel(self.__frameHorloge,text="00:00:00",font=("Roboto", 45, "bold"))
 
         # Minuteur
         # Set Minuteur
-        picketMinuteur = self._arrtk.createHourPickert(self.__frameSetMinuteur,
-                                                       varHour=self.__varMinute,
-                                                       varMinute=self.__varSec)
-        btnReset = self._arrtk.createButton(self.__frameSetMinuteur,text="Reset"
-                                            ,command=self.__resetMinuteur,
-                                            bg=self._btnColor,fg=self._btnTexteColor,
-                                            ppolice="Arial",ptaille=25)
-        btnStartMinuteur1 = self._arrtk.createButton(self.__frameSetMinuteur,text="Start",
-                                                     command=self.__startMinuteur,
-                                                     bg=self._btnColor,fg=self._btnTexteColor,
-                                                     ppolice="Arial",ptaille=25)
-        btnStartMinuteur2 = self._arrtk.createButton(self.__frameSetMinuteur,text="1 Min",
-                                                     command=self.__setOneMin,
-                                                     bg=self._btnColor,fg=self._btnTexteColor,
-                                                     ppolice="Arial",ptaille=25)
-        btnStartMinuteur3 = self._arrtk.createButton(self.__frameSetMinuteur, text="3 Min",
-                                                     command=self.__setThreeMin,
-                                                     bg=self._btnColor,fg=self._btnTexteColor,
-                                                     ppolice="Arial",ptaille=25)
-
+        self.__picket_minuteur = aHourPickers(self.__frameSetMinuteur,minute_pickers=True)
+        btnReset = aButton(self.__frameSetMinuteur,text="Reset",command=self.__resetMinuteur)
+        btnStartMinuteur1 = aButton(self.__frameSetMinuteur,text="Start",command=self.__startMinuteur)
+        btnStartMinuteur2 = aButton(self.__frameSetMinuteur,text="1 Min",command=self.__setOneMin)
+        btnStartMinuteur3 = aButton(self.__frameSetMinuteur, text="3 Min",command=self.__setThreeMin)
 
         # View Minuteur
-        self.__labelViewTimeMinuteur = self._arrtk.createLabel(self.__frameViewMinuteur,text="00:00:00",
-                                                        ppolice="Arial",ptaille=60,pstyle="bold")
-        btnStopMinuteur = self._arrtk.createButton(self.__frameViewMinuteur,text="Stop",
-                                                  command=self.__fncHorloge.stopMinuteur,
-                                                   bg=self._btnColor,fg=self._btnTexteColor,
-                                                   ppolice="Arial",ptaille=25)
+        self.__labelViewTimeMinuteur = aLabel(self.__frameViewMinuteur,text="00:00:00",font=("Roboto", 45, "bold"))
+        btnStopMinuteur = aButton(self.__frameViewMinuteur,text="Stop",command=self.__fncHorloge.stopMinuteur)
 
         # Chrono
-        self.__labelViewChrono = self._arrtk.createLabel(self.__frameChrono,text="00:00:00",
-                                                        ppolice="Arial",ptaille=60,pstyle="bold")
+        self.__labelViewChrono = aLabel(self.__frameChrono,text="00:00:00",font=("Roboto", 45, "bold"))
 
-        btnResetChrono = self._arrtk.createButton(self.__frameChrono,text="Reset",
-                                                  command=self.__resetChrono,
-                                                  bg=self._btnColor,fg=self._btnTexteColor,
-                                                  ppolice="Arial",ptaille=25)
+        btnResetChrono = aButton(self.__frameChrono,text="Reset",command=self.__resetChrono)
 
-        self.__btnStartStopChrono = self._arrtk.createButton(self.__frameChrono,text="Start",
-                                                             command=self.__enableOrDisableChrono,
-                                                             bg=self._btnColor,fg=self._btnTexteColor,
-                                                             ppolice="Arial",ptaille=25)
+        self.__btnStartStopChrono = aButton(self.__frameChrono,text="Start",command=self.__enableOrDisableChrono)
 
         # Placement des widget
         btnHorloge.grid( row=0, column=1, padx=(8, 8), pady=10)
@@ -143,7 +109,7 @@ class GUIHorloge(GuiBase):
 
         self.__labelViewClock.grid(row=0, column=0, padx=10, pady=10)
 
-        picketMinuteur.grid(row=1, column=1, padx=12, pady=12)
+        self.__picket_minuteur.grid(row=1, column=1, padx=12, pady=12)
         btnStartMinuteur2.grid(row=1, column=0, padx=8, pady=8)
         btnStartMinuteur3.grid(row=1, column=2, padx=8, pady=8)
         btnReset.grid(row=2, column=1, padx=8, pady=(6, 2))
@@ -206,21 +172,21 @@ class GUIHorloge(GuiBase):
 
     # Minuteur
     def __setThreeMin(self):
-        self.__varMinute.set("03")
-        self.__varSec.set("00")
+        self.__picket_minuteur.setValueHour("03")
+        self.__picket_minuteur.setValueMinute("00")
 
     def __setOneMin(self):
-        self.__varMinute.set("01")
-        self.__varSec.set("00")
+        self.__picket_minuteur.setValueHour("01")
+        self.__picket_minuteur.setValueMinute("00")
 
     def __resetMinuteur(self):
-        self.__varMinute.set("00")
-        self.__varSec.set("00")
+        self.__picket_minuteur.setValueHour("00")
+        self.__picket_minuteur.setValueMinute("00")
         self.__labelViewTimeMinuteur.configure(text="00:00:00")
 
     def __startMinuteur(self):
-        min = self.__varMinute.get()
-        sec = self.__varSec.get()
+        min = self.__picket_minuteur.getValueHour()
+        sec = self.__picket_minuteur.getValueMinute()
         if min == "" and sec == "":
             return False
         try :

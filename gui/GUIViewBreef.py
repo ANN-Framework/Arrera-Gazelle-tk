@@ -1,35 +1,43 @@
+import threading
 from tkinter.messagebox import showerror
 import threading as th
 from gui.guibase import GuiBase,gestionnaire
-import customtkinter as ctk
+from librairy.arrera_tk import *
 
 class GUIViewBreef(GuiBase):
     def __init__(self,gestionnaire:gestionnaire):
         super().__init__(gestionnaire,"Breef")
         self.__readVar = ""
+        self.__out_breef = None
         self.__thRead = th.Thread()
+        self.__thLoad = th.Thread()
 
     def _mainframe(self):
         # Configuration de la fenetre
         self._screen.grid_rowconfigure(0, weight=1)
         self._screen.grid_columnconfigure(0, weight=1)
         # Frame
-        mainFrame = self._arrtk.createFrame(self._screen)
+        self.__main_frame = aFrame(self._screen)
 
-        weatherFrame = self._arrtk.createFrame(mainFrame)
-        alertFrame = self._arrtk.createFrame(weatherFrame)
+        self.__load_frame = aFrame(self._screen)
 
-        tasksContainer = self._arrtk.createFrame(mainFrame)
-        taskFrame = self._arrtk.createFrame(tasksContainer)
-        taskProjectFrame = self._arrtk.createFrame(tasksContainer)
+        weatherFrame = aFrame(self.__main_frame)
+        alertFrame = aFrame(weatherFrame)
+
+        tasksContainer = aFrame(self.__main_frame,fg_color=self.__main_frame.cget("fg_color"))
+        taskFrame = aFrame(tasksContainer,fg_color=weatherFrame.cget("fg_color"))
+        taskProjectFrame = aFrame(tasksContainer,fg_color=weatherFrame.cget("fg_color"))
 
         # Configuration
-        mainFrame.grid_columnconfigure(0, weight=1)
-        mainFrame.grid_rowconfigure(0, weight=0)
-        mainFrame.grid_rowconfigure(1, weight=0)
-        mainFrame.grid_rowconfigure(2, weight=1)
-        mainFrame.grid_rowconfigure(3, weight=0)
-        mainFrame.grid_rowconfigure(4, weight=0)
+        self.__main_frame.grid_columnconfigure(0, weight=1)
+        self.__main_frame.grid_rowconfigure(0, weight=0)
+        self.__main_frame.grid_rowconfigure(1, weight=0)
+        self.__main_frame.grid_rowconfigure(2, weight=1)
+        self.__main_frame.grid_rowconfigure(3, weight=0)
+        self.__main_frame.grid_rowconfigure(4, weight=0)
+
+        self.__load_frame.grid_rowconfigure(0, weight=1)
+        self.__load_frame.grid_columnconfigure(0, weight=1)
 
         weatherFrame.rowconfigure(0, weight=1)
         weatherFrame.rowconfigure(1, weight=1)
@@ -54,38 +62,30 @@ class GUIViewBreef(GuiBase):
         tasksContainer.grid_rowconfigure(0, weight=1)
 
         # Widgets
-        labelTitle = self._arrtk.createLabel(mainFrame,text=self._gestionnaire.getName()+" : Breef",
-                                             ppolice="Arial",ptaille=30,pstyle="bold")
-        btnRead = self._arrtk.createButton(mainFrame,text="Lire",ppolice="Arial",ptaille=20,command=self.__readBreef,
-                                           pstyle="normal",bg=self._btnColor,fg=self._btnTexteColor)
+        labelTitle = aLabel(self.__main_frame,text=self._gestionnaire.getName()+" : Breef",police_size=35)
+        btnRead = aButton(self.__main_frame,text="Lire",size=25,command=self.__readBreef)
+
+        # Load
+        label_load = aLabel(self.__load_frame,text="Chargement du breef en cours...",police_size=25)
 
         # Meteo
-        self.__labelLogoMeteo = self._arrtk.createLabel(weatherFrame,text="Logo")
+        self.__labelLogoMeteo = aLabel(weatherFrame,text="Logo")
 
-        self.__lnameTown = self._arrtk.createLabel(weatherFrame,text="Ville",
-                                                   ppolice="Arial",ptaille=30,pstyle="bold",justify="left")
-        self.__ltemp = self._arrtk.createLabel(weatherFrame,text="Temperature",
-                                               ppolice="Arial",ptaille=40,pstyle="bold",justify="left")
-        self.__lweather = self._arrtk.createLabel(weatherFrame,text="description",
-                                                  ppolice="Arial",ptaille=25,pstyle="bold",justify="left")
+        self.__lnameTown = aLabel(weatherFrame,text="Ville",justify="left",police_size=25)
+        self.__ltemp = aLabel(weatherFrame,text="Temperature",justify="left",police_size=25)
+        self.__lweather = aLabel(weatherFrame,text="description",justify="left",police_size=25)
 
-        self.__lAlertRed = self._arrtk.createLabel(alertFrame,text="Alerte",bg="red",
-                                                   ppolice="Arial",ptaille=20,pstyle="bold",justify="left")
-        self.__lAlertOrange = self._arrtk.createLabel(alertFrame,text="Alerte",bg="orange",fg="black",
-                                                      ppolice="Arial",ptaille=20,pstyle="bold",justify="left")
-        self.__lAlertYellow = self._arrtk.createLabel(alertFrame,text="Alerte",bg="yellow",fg="black",
-                                                      ppolice="Arial",ptaille=20,pstyle="bold",justify="left")
-        self.__lNoAlert = self._arrtk.createLabel(alertFrame,text="Aucune d'alerte",
-                                                  ppolice="Arial",ptaille=20,pstyle="bold",justify="left")
+        self.__lAlertRed = aLabel(alertFrame,text="Alerte",justify="left",police_size=25)
+        self.__lAlertOrange = aLabel(alertFrame,text="Alerte",justify="left",police_size=25)
+        self.__lAlertYellow = aLabel(alertFrame,text="Alerte",justify="left",police_size=25)
+        self.__lNoAlert = aLabel(alertFrame,text="Aucune d'alerte",justify="left",police_size=25)
 
         # Task
-        lTitleTask = self._arrtk.createLabel(taskFrame,text="Tâches du jour",
-                                             ppolice="Arial",ptaille=35,pstyle="bold")
-        self.__fViewTask = self._arrtk.createScrollFrame(taskFrame)
+        lTitleTask = aLabel(taskFrame,text="Tâches du jour",police_size=30)
+        self.__fViewTask = aScrollableFrame(taskFrame)
 
-        lTitleTaskProject = self._arrtk.createLabel(taskProjectFrame,text="Tâches sur le projet",
-                                             ppolice="Arial",ptaille=35,pstyle="bold")
-        self.__fViewTaskProject = self._arrtk.createScrollFrame(taskProjectFrame)
+        lTitleTaskProject = aLabel(taskProjectFrame,text="Tâches sur les projets",police_size=30)
+        self.__fViewTaskProject = aScrollableFrame(taskProjectFrame)
         # Placement
         labelTitle.grid(row=0, column=0, sticky="ew", padx=10, pady=(10, 5))
         weatherFrame.grid(row=1, column=0, sticky="ew", padx=10, pady=5)
@@ -107,19 +107,37 @@ class GUIViewBreef(GuiBase):
         lTitleTaskProject.grid(row=0, column=0, sticky="n", pady=(10, 6))
         self.__fViewTaskProject.grid(row=1, column=0, sticky="nsew", padx=10, pady=(0, 10))
 
-        mainFrame.grid(row=0, column=0, sticky="nsew")
+        label_load.grid(row=0, column=0)
 
     def activeBreef(self):
         self.active()
-        outBreef = self._gestionnaire.getGestFNC().getFNCBreef().morningBreef()
-        if outBreef is None:
-            showerror("Erreur","Impossible de charger le breef du jour")
-            self._screen.destroy()
-        else:
-            self.__selectMeteo(outBreef)
-            self.__setTask(self.__fViewTask,outBreef["task"])
-            self.__setReadForTask(outBreef["task"])
-            self.__setTaskProjet(outBreef["tacheProjet"])
+        self.__load_frame.grid(row=0, column=0, sticky="nsew")
+        self.__thLoad = threading.Thread(target=self.__load_breef)
+        self.__thLoad.start()
+        self._screen.update()
+        self._screen.after(100, self.__update_during_load_breef)
+
+    def __load_breef(self):
+        self.__out_breef = self._gestionnaire.getGestFNC().getFNCBreef().morningBreef()
+
+    def __update_during_load_breef(self):
+        if self.__thLoad.is_alive():
+            self._screen.update()
+            self._screen.after(100,self.__update_during_load_breef)
+        else :
+            self._screen.update()
+            if self.__out_breef is None:
+                showerror("Erreur", "Impossible de charger le breef du jour")
+                self._screen.destroy()
+            else:
+                self.__load_frame.grid_forget()
+                self.__main_frame.grid(row=0, column=0, sticky="nsew")
+
+                self.__selectMeteo(self.__out_breef)
+                self.__setTask(self.__fViewTask, self.__out_breef["task"])
+                self.__setReadForTask(self.__out_breef["task"])
+                self.__setTaskProjet(self.__out_breef["tacheProjet"])
+
 
     def __setTask(self,frame:ctk.CTkFrame,listTask:list):
 
@@ -128,12 +146,10 @@ class GUIViewBreef(GuiBase):
 
         if len(listTask) != 0:
             for i,task in enumerate(listTask):
-                ltask = self._arrtk.createLabel(frame,text=f"- {task}",
-                                                ppolice="Arial",ptaille=20,pstyle="normal",justify="left")
+                ltask = aLabel(frame,text=f"- {task}",justify="left")
                 ltask.grid(row=i, column=0, sticky="w", padx=8, pady=4)
         else:
-            ltask = self._arrtk.createLabel(frame,text="Aucune tâche à faire !",
-                                            ppolice="Arial",ptaille=20,pstyle="normal",justify="left")
+            ltask = aLabel(frame,text="Aucune tâche à faire !",justify="left")
             ltask.grid(row=0, column=0, sticky="w", padx=8, pady=4)
 
     def __setTaskProjet(self,taskProject:dict):
@@ -165,11 +181,11 @@ class GUIViewBreef(GuiBase):
         self.__readVar = f"La meteo à {meteoDict["ville"]} est {meteoDict["weather"]} avec une temperature de {meteoDict["temperature"]}°C. "
 
         try :
-            imgMeteo = self._arrtk.createImage(meteoDict["icon"],tailleX=100,tailleY=100)
+            imgMeteo = aImage(path_light=meteoDict["icon"],width=100,height=100)
             self.__labelLogoMeteo.configure(image=imgMeteo,text="")
-        except:
-            imgMeteo = self._arrtk.createImage(self._gestionnaire.getConfigFile().asset+"meteo/meteo-error.png",
-                                               tailleX=100,tailleY=100)
+        except Exception as e:
+            imgMeteo = aImage(path_light=self._gestionnaire.getConfigFile().asset+"meteo/meteo-error.png",
+                              width=100, height=100)
             self.__labelLogoMeteo.configure(image=imgMeteo,text="")
 
         self.__lNoAlert.grid(row=1, column=0, sticky="ew", padx=8, pady=4)

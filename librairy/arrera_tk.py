@@ -1,842 +1,735 @@
 import customtkinter as ctk
 from tkinter import *
-from tkinter import BooleanVar, StringVar
-from PIL import Image, ImageTk
+from PIL import Image
 import webbrowser as wb
-import os
-import sys
 import platform
-from typing import Union
+import os
+import subprocess
+import sys
+from typing import Union, Callable
 
-VERSIONARRERATK = "1.5.0"
+from customtkinter import CTkCanvas, CTkImage
 
-class CArreraTK :
-    def __init__(self):
-        self.__mode = 0
-        self.__windowsColor = ""
-        self.__textColor = ""
-        self.__images = []
+VERSIONARRERATK = "2.1.0"
 
-    # Methode pour gerer les asset sur mac os
-    def __resource_path(self,relative_path):
-        if platform.system() == "Darwin":
-            if hasattr(sys, '_MEIPASS'):
-                return os.path.join(sys._MEIPASS, relative_path)
-            return os.path.join(os.path.abspath("."), relative_path)
-        else:
-            return relative_path
 
-    # Methode creation de fenetre ou toplevel
+# Fonction pour gerer les resource sur mac os
+def resource_path(relative_path):
+    if platform.system() == "Darwin":
+        if hasattr(sys, '_MEIPASS'):
+            return os.path.join(sys._MEIPASS, relative_path)
+        return os.path.join(os.path.abspath("."), relative_path)
+    else:
+        return relative_path
 
-    def aTK(self, mode: int = 0, width: int = 800, height: int = 600,title: str = "ArreraTK", resizable: bool = False, bg: str = "", fg: str = "", icon: str = ""):
-        """
-        :param mode: 1 for Tkinter, 0 for customtkinter
-        :param mainWindow: True for main window, False for Toplevel
-        :param width: width of the window
-        :param height: height of the window
-        :param title: title of the window
-        :param resizable: True for resizable, False for not resizable
-        :param bg:  background color
-        :param fg:  text color
-        :param icon: icon of the window (ico file)
-        """
-        ctk.set_appearance_mode("system")
-        ctk.set_default_color_theme("blue")
-        ctheme = ctk.get_appearance_mode()
-        if ctheme == "Dark":
-            defaultColor = ctk.ThemeManager.theme["CTk"]["fg_color"][1]
-            defaultTextColor = ctk.ThemeManager.theme["CTk"]["fg_color"][0]
-        else:
-            defaultColor = ctk.ThemeManager.theme["CTk"]["fg_color"][0]
-            defaultTextColor = ctk.ThemeManager.theme["CTk"]["fg_color"][1]
-        self.__mode = mode
-        if mode == 0:
-            self.__root = ctk.CTk()
-            self.__root.configure(fg_color=defaultColor)
-        else:
-            self.__root = Tk()
-        icon = self.__resource_path(icon)
-        if icon != "":
-            if platform.system() == "Windows":
-                if os.path.splitext(icon)[1].lower() == '.ico' :
-                    self.__root.iconbitmap(icon)
-            elif os.path.splitext(icon)[1].lower() == '.png' :
-                    self.__root.iconphoto(True, PhotoImage(file=icon))
-        self.__root.geometry(f"{width}x{height}")
-        self.__root.title(title)
-        self.__root.resizable(resizable, resizable)
-        if bg == "":
-            self.__root.configure(bg=defaultColor)
-            self.__windowsColor = defaultColor
-            self.__textColor = defaultTextColor
-        else:
-            self.__root.configure(bg=bg)
-            self.__windowsColor = bg
-            self.__textColor = fg
+# Class de placement custome
 
-        return self.__root
+def copie_text(text:str):
+    current_os = platform.system()
+    text_to_copy = str(text)
 
-    def aTopLevel(self, mode: int = 0, width: int = 800, height: int = 600,title: str = "ArreraTK", resizable: bool = False, bg: str = "", fg: str = "", icon: str = ""):
-        """
-        :param mode: 1 for Tkinter, 0 for customtkinter
-        :param mainWindow: True for main window, False for Toplevel
-        :param width: width of the window
-        :param height: height of the window
-        :param title: title of the window
-        :param resizable: True for resizable, False for not resizable
-        :param bg:  background color
-        :param fg:  text color
-        :param icon: icon of the window (ico file)
-        """
-        ctk.set_appearance_mode("system")
-        ctk.set_default_color_theme("blue")
-        ctheme = ctk.get_appearance_mode()
-        if ctheme == "Dark":
-            defaultColor = ctk.ThemeManager.theme["CTk"]["fg_color"][1]
-            defaultTextColor = ctk.ThemeManager.theme["CTk"]["fg_color"][0]
-        else:
-            defaultColor = ctk.ThemeManager.theme["CTk"]["fg_color"][0]
-            defaultTextColor = ctk.ThemeManager.theme["CTk"]["fg_color"][1]
-        self.__mode = mode
-        if mode == 0:
-            self.__root = ctk.CTkToplevel()
-        else:
-            self.__root = Toplevel()
-        icon = self.__resource_path(icon)
-        if icon != "":
-            if platform.system() == "Windows":
-                if os.path.splitext(icon)[1].lower() == '.ico':
-                    self.__root.iconbitmap(icon)
-            elif os.path.splitext(icon)[1].lower() == '.png':
-                self.__root.iconphoto(True, PhotoImage(file=icon))
-        self.__root.geometry(f"{width}x{height}")
-        self.__root.title(title)
-        self.__root.resizable(resizable, resizable)
-        if bg == "":
-            self.__root.configure(fg_color=defaultColor)
-            self.__windowsColor = defaultColor
-            self.__textColor = defaultTextColor
-        else:
-            self.__root.configure(fg_color=bg)
-            self.__windowsColor = bg
-            self.__textColor = fg
+    try:
+        if current_os == "Windows":
+            subprocess.run(['clip'], input=text_to_copy, check=True, text=True)
 
-        return self.__root
+        elif current_os == "Darwin":
+            subprocess.run(['pbcopy'], input=text_to_copy, check=True, text=True)
 
-    # Methode pour afficher la fenetre
+        elif current_os == "Linux":
+            try:
+                subprocess.run(['xclip', '-selection', 'clipboard'], input=text_to_copy, check=True, text=True)
+            except FileNotFoundError:
+                subprocess.run(['xsel', '--clipboard', '--input'], input=text_to_copy, check=True, text=True)
 
-    def view(self):
-        self.__root.mainloop()
+        return True
 
-    # Methode pour gerer les fenetres
+    except Exception as e:
+        print(f"Erreur lors de la copie système : {e}")
+        return False
 
-    def title(self, title: str):
-        self.__root.title(title)
 
-    def setGeometry(self, width: int, height: int):
-        self.__root.geometry(f"{width}x{height}")
 
-    def setResizable(self, resizable: bool):
-        self.__root.resizable(resizable, resizable)
 
-    def setColor(self, bg: str, fg: str):
-        self.__root.configure(bg=bg)
-        self.__windowsColor = bg
-        self.__textColor = fg
+class placement_Tool_Kit_internet:
+    def placeCenter(self):
+        self.place(relx=0.5, rely=0.5, anchor='center')
 
-    # Methode pour ajouter un menu a la fenetre
-    def createTopMenu(self,master:Union[Tk,ctk.CTk, Toplevel, ctk.CTkToplevel,Menu]):
-        newMenu = Menu(master, tearoff=0, bg=self.__windowsColor, fg=self.__textColor)
-        if isinstance(master, (Tk, ctk.CTk, Toplevel, ctk.CTkToplevel)):
-            master.configure(menu=newMenu)
-        return newMenu
+    def placeLeftCenter(self):
+        self.place(relx=0, rely=0.5, anchor='w')
 
-    def addCommandTopMenu(self,menu:Menu,command,text:str):
-        menu.add_command(label=text,command=command)
+    def placeRightCenter(self):
+        self.place(relx=1, rely=0.5, anchor='e')
 
-    def addCascadeTopMenu(self, menuMaster:Menu, menuChild:Menu, text:str):
-        menuMaster.add_cascade(label=text, menu=menuChild)
+    def placeTopCenter(self):
+        self.place(relx=0.5, rely=0, anchor='n')
 
-    # Creation d'image
+    def placeBottomCenter(self):
+        self.place(relx=0.5, rely=1, anchor='s')
 
-    def createImage(self, pathLight: str, pathDark: str = "none", tailleX: int = 250, tailleY: int = 250):
-        """
-        :param pathLight: Image light path
-        :param pathDark: Image dark path
-        :param tailleX: Width of the image
-        :param tailleY: Height of the image
-        :return: CTkImage or PhotoImage object
-        """
-        if (self.__mode == 0):
-            if (pathDark != "none"):
-                image = ctk.CTkImage(
-                    light_image=Image.open(self.__resource_path(pathLight)),
-                    dark_image=Image.open(self.__resource_path(pathDark)),
-                    size=(tailleX, tailleY))
-                return image
-            else :
-                image = ctk.CTkImage(
-                    light_image=Image.open(pathLight),
-                    size=(tailleX, tailleY))
-                return image
-        else :
-            if (pathDark != "none"):
-                imageLight = PhotoImage(file=self.__resource_path(pathLight))
-                imageDark = PhotoImage(file=self.__resource_path(pathDark))
-                return [imageLight, imageDark]
-            else :
-                imageLight = PhotoImage(file=self.__resource_path(pathLight))
-                return imageLight
-
-    # Methode pour creer les widgets
-
-    def createLabel(self, screen, text: str = "", image : Union[ctk.CTkImage, PhotoImage] = None, bg : str = "", fg : str = "", ppolice : str = "Arial", ptaille : int = 12,pstyle : str = "normal",width : int = 0,height : int = 0,pwraplength : int = 0,justify : str = "center"):
-        if (self.__mode == 0):
-            label = ctk.CTkLabel(screen)
-            if (text != ""):
-                label.configure(text=text)
-            if (image != None):
-                label.configure(image=image)
-                label.configure(text="")
-            if (fg != ""):
-                label.configure(text_color=fg)
-            if (bg != ""):
-                label.configure(fg_color=bg)
-            if (width != 0):
-                label.configure(width=width)
-            if (height != 0):
-                label.configure(height=height)
-            if (pwraplength != 0):
-                label.configure(wraplength=pwraplength)
-            police = "Arial"
-            style = "normal"
-            taille = 12
-            if (ppolice != "Arial"):
-                police = ppolice
-            if (ptaille != 12):
-                taille = ptaille
-            if (pstyle != "normal" and (pstyle == "bold" or pstyle == "italic" or pstyle == "underline")):
-                style = pstyle
-            if (image != None):
-                label.configure(image=image)
-            label.configure(font=(police, taille, style),justify=justify)
-        else :
-            label = Label(screen)
-            if (text != ""):
-                label.configure(text=text)
-            if (image != None):
-                label.configure(image=image)
-            if (bg != ""):
-                label.configure(bg=bg)
-            if (fg != ""):
-                label.configure(fg=fg)
-            if (width != 0):
-                label.configure(width=width)
-            if (height != 0):
-                label.configure(height=height)
-            if (pwraplength != 0):
-                label.configure(wraplength=pwraplength)
-            if (ppolice != "Arial" or ptaille != 12):
-                label.configure(font=(ppolice, ptaille))
-        return label
-
-    def createButton(self, screen, text: str = "", image : Union[ctk.CTkImage, PhotoImage] = None, bg : str = "", fg : str = "", command = None,ppolice : str = "Arial", ptaille : int = 12,pstyle :str = "normal",width : int = 0,height : int = 0,hoverbg:str="",conerRadus:int = 0):
-        if (self.__mode == 0):
-            btn = (ctk.CTkButton(screen))
-            if (text != ""):
-                btn.configure(text=text)
-            else :
-                btn.configure(text="")
-            if (image != None):
-                btn.configure(image=image)
-                btn.configure(text="")
-            if (fg != ""):
-                btn.configure(text_color=fg)
-            if (bg != ""):
-                btn.configure(fg_color=bg)
-            if (hoverbg != ""):
-                btn.configure(hover_color=hoverbg)
-            if (command != None):
-                btn.configure(command=command)
-            if (width != 0):
-                btn.configure(width=width)
-            if (height != 0):
-                btn.configure(height=height)
-            if conerRadus != 0:
-                btn.configure(corner_radius=conerRadus)
-            police = "Arial"
-            style = "normal"
-            taille = 12
-            if (ppolice != "Arial"):
-                police = ppolice
-            if (ptaille != 12):
-                taille = ptaille
-            if (pstyle != "normal" and (pstyle == "bold" or pstyle == "italic" or pstyle == "underline")):
-                style = pstyle
-
-            btn.configure(font=(police,taille,style))
-
-        else :
-            btn = Button(screen)
-            if (text != ""):
-                btn.configure(text=text)
-            else :
-                btn.configure(text="")
-            if (image != None):
-                btn.configure(image=image)
-            if (bg != ""):
-                btn.configure(bg=bg)
-            if (fg != ""):
-                btn.configure(fg=fg)
-            if (command != None):
-                btn.configure(command=command)
-            if (ppolice != "Arial" or ptaille != 12):
-                btn.configure(font=(ppolice, ptaille))
-            if (width != 0):
-                btn.configure(width=width)
-            if (height != 0):
-                btn.configure(height=height)
-        return btn
-
-    def createEntry(self, screen, bg : str = "", fg : str = "", placeholderText :str = "", ppolice : str = "Arial", ptaille : int = 12, width : int = 20):
-        if (self.__mode == 0):
-            entry = ctk.CTkEntry(screen)
-            if (fg != ""):
-                entry.configure(text_color=fg)
-            if (bg != ""):
-                entry.configure(fg_color=bg)
-            if (placeholderText != ""):
-                entry.configure(placeholder_text=placeholderText)
-            if (ppolice != "Arial" or ptaille != 12):
-                entry.configure(font=(ppolice, ptaille, "normal"))
-            if (width != 20):
-                entry.configure(width=width)
-
-        else :
-            entry = Entry(screen)
-            if (bg != ""):
-                entry.configure(bg=bg)
-            if (fg != ""):
-                entry.configure(fg=fg)
-            if (ppolice != "Arial" or ptaille != 12):
-                entry.configure(font=(ppolice, ptaille))
-        return entry
-
-    def createText(self, screen,width : int = 0,height : int = 0, bg : str = "", fg : str = "",ppolice : str = "Arial", ptaille : int = 12,pstyle : str = "normal",center : bool = False):
-        if self.__mode == 0:
-            text = ctk.CTkTextbox(screen)
-            if bg != "":
-                text.configure(fg_color=bg)
-            if fg != "":
-                text.configure(text_color=fg)
-            if width != 0:
-                text.configure(width=width)
-            if height != 0:
-                text.configure(height=height)
-
-            police = "Arial"
-            style = "normal"
-            taille = 12
-
-            if (ppolice != "Arial"):
-                police = ppolice
-            if (ptaille != 12):
-                taille = ptaille
-            if (pstyle != "normal" and (pstyle == "bold" or pstyle == "italic" or pstyle == "underline")):
-                style = pstyle
-
-            text.configure(font=(police, taille, style))
-
-            if center:
-                text._textbox.tag_configure("center", justify="center")
-                text._textbox.tag_add("center", "0.0", "end")
-        else:
-            text = Text(screen)
-            if (bg != ""):
-                text.configure(bg=bg)
-            if (fg != ""):
-                text.configure(fg=fg)
-
-        return text
-
-    def createCheckbox(self, screen,var_chk : BooleanVar, text: str = "", bg : str = "", fg : str = "",command = None):
-        if (self.__mode == 0):
-            checkbox = ctk.CTkCheckBox(screen, text=text, variable=var_chk)
-            if (bg != ""):
-                checkbox.configure(bg=bg)
-            if (fg != ""):
-                checkbox.configure(fg=fg)
-            if command is not None:
-                checkbox.configure(command=command)
-        else :
-            checkbox = Checkbutton(screen,text=text,variable=var_chk)
-            if (bg != ""):
-                checkbox.configure(bg=bg)
-            if (fg != ""):
-                checkbox.configure(fg=fg)
-        return checkbox
-
-    def createRadioButton(self, screen, text: str = "", bg : str = "", fg : str = ""):
-        if (self.__mode == 0):
-            radio = ctk.CTkRadioButton(screen)
-            if (text != ""):
-                radio.configure(text=text)
-            if (bg != ""):
-                radio.configure(bg_color=bg)
-            if (fg != ""):
-                radio.configure(fg_color=fg)
-        else :
-            radio = Radiobutton(screen,text=text)
-            if (bg != ""):
-                radio.configure(bg=bg)
-            if (fg != ""):
-                radio.configure(fg=fg)
-        return radio
-
-    def createCanvas(self, screen, width: int, height: int, bg : str = "",imageFile : str = ""):
-        canvas = Canvas(screen, width=width, height=height)
-        if (bg != ""):
-            canvas.configure(bg=bg)
-        if (imageFile != ""):
-            photo = PhotoImage(file=self.__resource_path(imageFile),master=canvas)
-            canvas.image_names = photo
-            canvas.create_image(0, 0, image=photo, anchor="nw")
-        return canvas
-
-    def createFrame(self, screen,width : int = 0 ,height : int = 0,  bg : str = "",wightBoder : int = 0,corner_radius : int = 1024):
-        if (self.__mode == 0):
-            frame = ctk.CTkFrame(screen)
-            if (width != 0):
-                frame.configure(width=width)
-            if (height != 0):
-                frame.configure(height=height)
-            if (bg != ""):
-                frame.configure(fg_color=bg)
-            else:
-                frame.configure(fg_color=self.__windowsColor)
-            if (wightBoder != 0):
-                frame.configure(border_width=wightBoder)
-            if (corner_radius != 1024):
-                frame.configure(corner_radius=corner_radius)
-            frame.update()
-        else :
-            frame = Frame(screen)
-            if (width != 0):
-                frame.configure(width=width)
-            if (height != 0):
-                frame.configure(height=height)
-            if (bg != ""):
-                frame.configure(bg=bg)
-            if (wightBoder != 0):
-                frame.configure(borderwidth=wightBoder,relief="solid")
-        return frame
-
-    def createScrollFrame(self, screen,width : int = 0 ,height : int = 0,  bg : str = "",wightBoder : int = 0,corner_radius : int = 1024):
-        if (self.__mode == 0):
-            frame = ctk.CTkScrollableFrame(screen)
-            if (width != 0):
-                frame.configure(width=width)
-            if (height != 0):
-                frame.configure(height=height)
-            if (bg != ""):
-                frame.configure(fg_color=bg)
-            else:
-                frame.configure(fg_color=self.__windowsColor)
-            if (wightBoder != 0):
-                frame.configure(border_width=wightBoder)
-            if (corner_radius != 1024):
-                frame.configure(corner_radius=corner_radius)
-            frame.update()
-        else :
-            frame = Frame(screen)
-            if (width != 0):
-                frame.configure(width=width)
-            if (height != 0):
-                frame.configure(height=height)
-            if (bg != ""):
-                frame.configure(bg=bg)
-            if (wightBoder != 0):
-                frame.configure(borderwidth=wightBoder,relief="solid")
-        return frame
-
-    def createOptionMenu(self,screen,value: list, var:StringVar,taille : int = 0, police :str = "",bg : str = "", fg : str = ""):
-        if (self.__mode == 0):
-            option = ctk.CTkOptionMenu(screen,variable=var,values=value)
-        else:
-            option = OptionMenu(screen,var,*value)
-        if (police != "" and taille != 0):
-            option.configure(font=(police,taille,"normal"))
-        var.set(value[0])
-        if bg != "":
-            if self.__mode == 0:
-                option.configure(fg_color=bg)
-        if fg != "":
-            if self.__mode == 0:
-                option.configure(text_color=fg)
-        return option
-
-    def createEntryLegend(self,screen, bg : str = "", fg : str = "",text :str = "", ppolice : str = "Arial", ptaille : int = 12, width : int = 20,gridUsed: bool = False):
-        widget = self.createFrame(screen)
-        label = self.createLabel(widget, text=text, bg=bg, fg=fg, ppolice=ppolice, ptaille=ptaille, width=width)
-        entry = self.createEntry(widget, bg=bg, fg=fg, ppolice=ppolice, ptaille=ptaille, width=width)
-        if gridUsed:
-            widget.grid_columnconfigure(0, weight=0)
-            widget.grid_columnconfigure(1, weight=1)
-            widget.grid_rowconfigure(0, weight=0)
-            label.grid(row=0, column=0, sticky="w",  padx=(8, 6), pady=6)
-            entry.grid(row=0, column=1, sticky="ew", padx=(6, 8), pady=6)
-        else :
-            label.pack(side="left")
-            entry.pack(side="right")
-        return widget,entry
-
-    def createTextBox(self,screen:Union[Tk,ctk.CTk,Toplevel,ctk.CTkToplevel],width:int = 0,height:int = 0,bg:str = "",fg:str = "",ppolice:str="Arial",ptaille:int=12,pstyle:str="normal",wrap:str="word",enableKeyboard:bool=False):
-        if (self.__mode == 0):
-            text = ctk.CTkTextbox(screen)
-            if (fg != ""):
-                text.configure(text_color=fg)
-            if (bg != ""):
-                text.configure(fg_color=bg)
-            if (width != 0):
-                text.configure(width=width)
-            if (height != 0):
-                text.configure(height=height)
-
-            police = "Arial"
-            style = "normal"
-            taille = 12
-
-            if (ppolice != "Arial"):
-                police = ppolice
-            if (ptaille != 12):
-                taille = ptaille
-            if (pstyle != "normal" and (pstyle == "bold" or pstyle == "italic" or pstyle == "underline")):
-                style = pstyle
-
-            text.configure(font=(police, taille, style),wrap=wrap)
-
-        else :
-            text = Text(screen,width=width,height=height,bg=bg,fg=fg)
-            if (fg != ""):
-                text.configure(fg=fg)
-            if (bg != ""):
-                text.configure(bg=bg)
-            if (width != 0):
-                text.configure(width=width)
-            if (height != 0):
-                text.configure(height=height)
-
-            police = "Arial"
-            style = "normal"
-            taille = 12
-
-            if (ppolice != "Arial"):
-                police = ppolice
-            if (ptaille != 12):
-                taille = ptaille
-            if (pstyle != "normal" and (pstyle == "bold" or pstyle == "italic" or pstyle == "underline")):
-                style = pstyle
-
-            text.configure(font=(police, taille, style))
-
-        if not enableKeyboard:
-            text.configure(state="disabled")
-        else :
-            text.configure(state="normal")
-        return text
-
-    def createArreraBackgroudImage(self,screen:Union[Tk,ctk.CTk,Toplevel,ctk.CTkToplevel],imageLight:str,imageDark :str = "",height:int = 600,width:int = 800):
-        if (self.__mode == 0):
-            if (imageDark != ""):
-                image = ctk.CTkImage(light_image=Image.open(self.__resource_path(imageLight)),
-                                     dark_image=Image.open(self.__resource_path(imageDark)),
-                                     size=(width, height))
-            else :
-                image = ctk.CTkImage(light_image=Image.open(self.__resource_path(imageLight))
-                                     ,size=(width, height))
-            frame = ctk.CTkFrame(screen,width=width,height=height,border_width=0)
-            label = ctk.CTkLabel(frame,image=image,text="")
-            label.place(relx=0.5, rely=0.5, anchor='center')
-            return frame
-
-    def createHourPickert(self,screen,varHour:StringVar,varMinute:StringVar):
-        hours   = [f"{h:02d}" for h in range(24)]
-        minutes = [f"{m:02d}" for m in range(60)]
-        widget = self.createFrame(screen)
-        hourPicker = self.createOptionMenu(widget,hours,varHour)
-        minutePicker = self.createOptionMenu(widget,minutes,varMinute)
-        hourPicker.pack(side="left")
-        self.createLabel(widget,text=" : ",ppolice="Arial",ptaille=20,pstyle="blod").pack(side="left")
-        minutePicker.pack(side="right")
-        varHour.set(hours[0])
-        varMinute.set(minutes[0])
-        return widget
-
-    def createTextBoxScrolled(self,screen:Union[Tk,ctk.CTk,Toplevel,ctk.CTkToplevel],ppolice:str="Arial",ptaille:int=12,pstyle:str="normal"):
-        if self.__mode == 0:
-            widget = self.createFrame(screen)
-            textbox = ctk.CTkTextbox(widget, wrap="word", state="disabled")
-            scrollbar = ctk.CTkScrollbar(widget, command=textbox.yview)
-            textbox.configure(yscrollcommand=scrollbar.set)
-
-        else :
-            widget = Frame(screen)
-            textbox = Text(widget, wrap="word", state="disabled")
-            scrollbar = Scrollbar(widget, orient="vertical", command=textbox.yview)
-            textbox.configure(yscrollcommand=scrollbar.set)
-            textbox.configure(font=(ppolice, ptaille, pstyle))
-
-        # Layout
-        widget.grid_rowconfigure(0, weight=1)
-        widget.grid_columnconfigure(0, weight=1)
-
-        textbox.grid(row=0, column=0, sticky="nsew", padx=(10, 0), pady=10)
-        scrollbar.grid(row=0, column=1, sticky="ns", padx=(0, 10), pady=10)
-
-        return widget, textbox
-
-    def labelChangeColor(self,label : Union[Label,ctk.CTkLabel],bg:str = "" ,fg :str = "" ):
-        if isinstance (label,Label):
-            if (bg != ""):
-                label.configure(bg=bg)
-            if (fg != ""):
-                label.configure(fg=fg)
-        else:
-            if (fg != ""):
-                label.configure(text_color=fg)
-            if (bg != ""):
-                label.configure(fg_color=bg)
-
-    def boutonChangeColor(self, button : Union[Button,ctk.CTkButton], bg:str, fg:str ="",hoverbg:str=""):
-        if isinstance (button, Button):
-            if (bg != ""):
-                button.configure(bg=bg)
-            if (fg != ""):
-                button.configure(fg=fg)
-        else:
-            if (fg != ""):
-                button.configure(text_color=fg)
-            if (bg != ""):
-                button.configure(fg_color=bg)
-            if (hoverbg != ""):
-                button.configure(hover_color=hoverbg)
-
-    # Methode pour placer les widgets dans la fenetre
-
-    # Place
-
-    def placeLeftTop(self, widget):
-        widget.place(relx=0, rely=0, anchor='nw')
-
-    def placeRightTop(self, widget):
-        widget.place(relx=1, rely=0, anchor='ne')
-
-    def placeLeftBottom(self, widget):
-        widget.place(relx=0, rely=1, anchor='sw')
-
-    def placeRightBottom(self, widget):
-        widget.place(relx=1, rely=1, anchor='se')
-
-    def placeCenter(self, widget):
-        widget.place(relx=0.5, rely=0.5, anchor='center')
-
-    def placeLeftCenter(self, widget):
-        widget.place(relx=0, rely=0.5, anchor='w')
-
-    def placeRightCenter(self, widget):
-        widget.place(relx=1, rely=0.5, anchor='e')
-
-    def placeTopCenter(self, widget):
-        widget.place(relx=0.5, rely=0, anchor='n')
-
-    def placeBottomCenter(self, widget):
-        widget.place(relx=0.5, rely=1, anchor='s')
-
-    def placeCenterOnWidth(self,widget,y :int = 0 ):
-        if (y==0):
+    def placeCenterOnWidth(self, y: int = 0):
+        if (y == 0):
             return
-        else :
-            widget.place(relx=0.5, y=y, anchor='n')
+        else:
+            self.place(relx=0.5, y=y, anchor='n')
 
-    def placeWidgetCenteredAtBottom(self, widget, x_offset=1):
-        widget.place(relx=0.5, rely=1, x=-x_offset, anchor="s")
+    def placeWidgetCenteredAtBottom(self, x_offset=1):
+        self.place(relx=0.5, rely=1, x=-x_offset, anchor="s")
 
-    def placeBottomRight(self,widget):
-        widget.place(relx=1, rely=1, anchor='se')
+    def placeBottomRight(self):
+        self.place(relx=1, rely=1, anchor='se')
 
-    def placeBottomLeft(self,widget):
-        widget.place(relx=0, rely=1, anchor='sw')
+    def placeBottomLeft(self):
+        self.place(relx=0, rely=1, anchor='sw')
 
-    def placeTopRight(self,widget):
-        widget.place(relx=1, rely=0, anchor='ne')
+    def placeTopRight(self):
+        self.place(relx=1, rely=0, anchor='ne')
 
-    def placeTopLeft(self,widget):
-        widget.place(relx=0, rely=0, anchor='nw')
+    def placeTopLeft(self):
+        self.place(relx=0, rely=0, anchor='nw')
 
-    def placeCenterRight(self,widget):
-        widget.place(relx=1, rely=0.5, anchor='e')
+    def placeCenterRight(self):
+        self.place(relx=1, rely=0.5, anchor='e')
 
-    def placeCenterLeft(self,widget):
-        widget.place(relx=0, rely=0.5, anchor='w')
+    def placeCenterLeft(self):
+        self.place(relx=0, rely=0.5, anchor='w')
 
-    def placeLeftBottomNoStick(self, widget):
-        widget.place(relx=0, rely=1, anchor='sw', x=10, y=-10)
+    def placeLeftBottomNoStick(self):
+        self.place(relx=0, rely=1, anchor='sw', x=10, y=-10)
 
-    def placeRightBottomNoStick(self, widget):
-        widget.place(relx=1, rely=1, anchor='se', x=-10, y=-10)
+    def placeRightBottomNoStick(self):
+        self.place(relx=1, rely=1, anchor='se', x=-10, y=-10)
 
-    def placeBottomCenterNoStick(self, widget):
-        widget.place(relx=0.5, rely=1, anchor='s', x=0, y=-10)
+    def placeBottomCenterNoStick(self):
+        self.place(relx=0.5, rely=1, anchor='s', x=0, y=-10)
 
     # Pack
 
-    def pack(self, widget,xExpand : bool = False , yExpand : bool = False):
-        if (xExpand and yExpand):
-            widget.pack(expand="both")
-        elif (xExpand):
-            widget.pack(expand="x")
-        elif (yExpand):
-            widget.pack(expand="y")
+    def pack(self, xExpand: bool = False, yExpand: bool = False, **kwargs):
+        if xExpand and yExpand:
+            kwargs.update({'expand': True, 'fill': 'both'})
+        elif xExpand:
+            kwargs.update({'expand': True, 'fill': 'x'})
+        elif yExpand:
+            kwargs.update({'expand': True, 'fill': 'y'})
+
+        super().pack(**kwargs)
+
+    def packLeft(self, xExpand: bool = False, yExpand: bool = False, **kwargs):
+        self.pack(xExpand=xExpand, yExpand=yExpand, side="left", **kwargs)
+
+    def packRight(self, xExpand: bool = False, yExpand: bool = False, **kwargs):
+        self.pack(xExpand=xExpand, yExpand=yExpand, side="right", **kwargs)
+
+    def packTop(self, xExpand: bool = False, yExpand: bool = False, **kwargs):
+        self.pack(xExpand=xExpand, yExpand=yExpand, side="top", **kwargs)
+
+    def packBottom(self, xExpand: bool = False, yExpand: bool = False, **kwargs):
+        self.pack(xExpand=xExpand, yExpand=yExpand, side="bottom", **kwargs)
+
+
+# Image
+
+class aImage(ctk.CTkImage):
+    def __init__(self, width: int, height: int, path_light: str, path_dark: str = ""):
+        if path_dark != "":
+            super().__init__(light_image=Image.open(resource_path(path_light)),
+                             dark_image=Image.open(resource_path(path_dark)),
+                             size=(width, height))
         else:
-            widget.pack()
+            super().__init__(light_image=Image.open(resource_path(path_light)), size=(width, height))
 
-    def packLeft(self, widget,xExpand : bool = False , yExpand : bool = False):
-        if (xExpand and yExpand):
-            widget.pack(expand="both",side="left")
-        elif (xExpand):
-            widget.pack(expand="x",side="left")
-        elif (yExpand):
-            widget.pack(expand="y",side="left")
+
+# Widget
+
+class aLabel(placement_Tool_Kit_internet, ctk.CTkLabel):
+    def __init__(self, master, text: str = "Arrera Label", police_size: int = 0, dark_color: str = "",
+                 light_color: str = "", light_text_color: str = "", dark_text_color: str = "",image : CTkImage = None, **kwargs):
+        super().__init__(master, text=text, **kwargs)
+        if police_size != 0:
+            self.configure(font=("Roboto", police_size, "bold"))
+
+        if dark_color != "" and light_color != "":
+            self.configure(fg_color=(light_color, dark_color))
+
+        if dark_text_color != "" and light_text_color != "":
+            self.configure(text_color=(light_text_color, dark_text_color))
+
+        if image is not None:
+            self.configure(image=image,text="")
+
+class aButton(placement_Tool_Kit_internet, ctk.CTkButton):
+    def __init__(self, master, text: str = "Arrera Button", width: int = 140, height: int = 40, command=None,
+                 size: int = 0, dark_color: str = "", light_color: str = "", light_text_color: str = "",
+                 dark_text_color: str = "", **kwargs):
+        super().__init__(master, text=text, width=width, height=height, command=command, **kwargs)
+        if size != 0:
+            self.configure(font=("Roboto", size, "bold"))
+
+        if dark_color != "" and light_color != "":
+            self.configure(fg_color=(light_color, dark_color))
+
+        if dark_text_color != "" and light_text_color != "":
+            self.configure(text_color=(light_text_color, dark_text_color))
+
+
+class aCheckBox(placement_Tool_Kit_internet, ctk.CTkCheckBox):
+    def __init__(self, master, boolean_value: bool, **kwargs):
+        if boolean_value:
+            self.__bVar = BooleanVar(master, value=True)
         else:
-            widget.pack(side="left")
+            self.__bVar = BooleanVar(master, value=True)
+        super().__init__(master, variable=self.__bVar, text="Arrera CheckBox", **kwargs)
 
-    def packRight(self, widget,xExpand : bool = False , yExpand : bool = False):
-        if (xExpand and yExpand):
-            widget.pack(expand="both",side="right")
-        elif (xExpand):
-            widget.pack(expand="x",side="right")
-        elif (yExpand):
-            widget.pack(expand="y",side="right")
+    def getBooleanVar(self):
+        return self.__bVar
+
+    def setFalse(self):
+        self.__bVar.set(False)
+
+    def setTrue(self):
+        self.__bVar.set(True)
+
+
+class aRadioButton(placement_Tool_Kit_internet, ctk.CTkRadioButton):
+    def __init__(self, master, text: str = "Arrera RadioButton", variable=None, value=0, command=None, **kwargs):
+        super().__init__(master, text=text, variable=variable, value=value, command=command, **kwargs)
+
+
+class aEntry(placement_Tool_Kit_internet, ctk.CTkEntry):
+    def __init__(self, master, police_size: int = 15, width: int = 20, **kwargs):
+        super().__init__(master, **kwargs)
+        self.configure(font=("Roboto", police_size, "bold"))
+        self.configure(width=width)
+
+
+class aText(placement_Tool_Kit_internet, ctk.CTkTextbox):
+    def __init__(self, master, police_size: int = 15, center: bool = False, **kwargs):
+        super().__init__(master, **kwargs)
+        self.configure(font=("Roboto", police_size, "normal"))
+
+        if center:
+            self._textbox.tag_configure("center", justify="center")
+            self._textbox.tag_add("center", "0.0", "end")
+
+    def disable_textbox(self):
+        self.configure(state="disabled")
+
+    def enable_textbox(self):
+        self.configure(state="normal")
+        self.focus()
+
+    def insert_text(self, text: str):
+        self.configure(state="normal")
+        self.insert("1.0", text)
+        self.configure(state="disabled")
+
+    def centre_text(self):
+        self._textbox.tag_configure("center", justify="center")
+
+
+class aTextScrollable(placement_Tool_Kit_internet, ctk.CTkFrame):
+    def __init__(self, master,police_size: int = 15):
+        super().__init__(master)
+        self.configure(border_width=0)
+
+        self.__textbox = ctk.CTkTextbox(self, wrap="word", state="disabled")
+        scrollbar = ctk.CTkScrollbar(self, command=self.__textbox.yview)
+        self.__textbox.configure(yscrollcommand=scrollbar.set)
+
+        self.__textbox.configure(font=("Roboto", police_size, "normal"))
+
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+
+        self.__textbox.grid(row=0, column=0, sticky="nsew", padx=(10, 0), pady=10)
+        scrollbar.grid(row=0, column=1, sticky="ns", padx=(0, 10), pady=10)
+
+    def getTextBox(self):
+        return self.__textbox
+
+    def enableTextBox(self):
+        self.__textbox.configure(state="normal")
+        self.__textbox.focus()
+
+    def disableTextBox(self):
+        self.__textbox.configure(state="disabled")
+
+
+class aEntryLengend(placement_Tool_Kit_internet, ctk.CTkFrame):
+    def __init__(self, master, text: str = "Arrera Entry Legend", bg: str = "", fg: str = "", police_size: int = 15,
+                 width: int = 200, gridUsed: bool = False):
+        super().__init__(master)
+        text = text + ":  "
+        self.__label = aLabel(self, text=text, font=("Roboto", police_size, "bold"))
+
+
+        if bg == "":
+            bg = master.cget("fg_color")
+
+        self.configure(fg_color=bg)
+        self.__label.configure(fg_color=bg)
+
+        if fg != "":
+            self.__label.configure(text_color=fg)
+
+        self.__entry = aEntry(self, police_size=police_size, width=width)
+
+        if gridUsed:
+            self.grid_columnconfigure(0, weight=0)
+            self.grid_columnconfigure(1, weight=1)
+            self.grid_rowconfigure(0, weight=0)
+            self.__label.grid(row=0, column=0, sticky="w", padx=(8, 6), pady=6)
+            self.__entry.grid(row=0, column=1, sticky="ew", padx=(6, 8), pady=6)
         else:
-            widget.pack(side="right")
+            self.__label.pack(side="left")
+            self.__entry.pack(side="right")
 
-    def packTop(self, widget,xExpand : bool = False , yExpand : bool = False):
-        if (xExpand and yExpand):
-            widget.pack(expand="both",side="top")
-        elif (xExpand):
-            widget.pack(expand="x",side="top")
-        elif (yExpand):
-            widget.pack(expand="y",side="top")
-        else:
-            widget.pack(side="top")
+    def getEntry(self):
+        return self.__entry
 
-    def packBottom(self, widget,xExpand : bool = False , yExpand : bool = False):
-        if (xExpand and yExpand):
-            widget.pack(expand="both",side="bottom")
-        elif (xExpand):
-                widget.pack(expand="x",side="bottom")
-        elif (yExpand):
-                widget.pack(expand="y",side="bottom")
-        else:
-            widget.pack(side="bottom")
+    def changeColorLabel(self, bg: str = "", fg: str = ""):
+        if bg != "":
+            self.__label.configure(fg_color=bg)
 
-    # Methode pour inserer du texte dans un TextBox ou Text
+        if fg != "":
+            self.__label.configure(text_color=fg)
 
-    def insertTextOnTextBox(self,textbox:Union[Text,ctk.CTkTextbox],text:str):
-        textbox.configure(state="normal")
-        textbox.insert("1.0", text)
-        textbox.configure(state="disabled")
+    def changeTextLabel(self, text: str):
+        self.__label.configure(text=text)
 
-    # Methode pour centrer le texte dans un TextBox ou Text
-
-    def centerTextOnTextWidget(self,text : ctk.CTkTextbox):
-        text._textbox.tag_add("center", "1.0", "end")
-
-     # Fenetre A propos concu pour les application d'Arrera Software (PEUX ETRE REPRIS POUR D'AUTRES ORGANISATIONS)
-
-    def aproposWindows(self,nameSoft:str,iconFile:str,version:str,copyright:str,linkSource:str,linkWeb:str,color_btn:str = "blue",color_btn_hover:str = "lightblue"):
-        """
-        :param nameSoft: Name of the software
-        :param iconFile: Icon of the software (ico or png file)
-        :param version: Version of the software
-        :param copyright: Copyright of the software
-        :param linkSource: Link to the source code of the software
-        :param linkWeb: Link to the website of the software or organization
-        :return:
-        """
-
-        if (self.__mode == 0):
-            apropos = ctk.CTkToplevel()
-            apropos.configure(bg=self.__windowsColor)
-            apropos.title("A propos : "+nameSoft)
-            apropos.maxsize(400,300)
-            apropos.minsize(400,300)
-            icon = ctk.CTkImage(light_image=Image.open(self.__resource_path(iconFile)),size=(100,100))
-            mainFrame = ctk.CTkFrame(apropos,width=400,height=250,border_width=0,fg_color=self.__windowsColor)
-            frameBTN = ctk.CTkFrame(apropos,width=400,height=50,border_width=0,fg_color=self.__windowsColor)
-            frameLabel = ctk.CTkFrame(apropos,border_width=0,fg_color=self.__windowsColor)
-
-            labelIcon = ctk.CTkLabel(mainFrame,image=icon,text="",fg_color=self.__windowsColor)
-            labelSoft = ctk.CTkLabel(frameLabel,text=nameSoft+" version "+version,font=("Arial",20),fg_color=self.__windowsColor)
-            labelVersion = ctk.CTkLabel(frameLabel,text="Arrera TK version "+VERSIONARRERATK,font=("Arial",13),fg_color=self.__windowsColor)
-            labelCopy = ctk.CTkLabel(mainFrame,text=copyright,font=("Arial",13),fg_color=self.__windowsColor)
-
-            btnLinkSource = ctk.CTkButton(frameBTN,text="Source code",command= lambda :  wb.open(linkSource),
-                                          font=("Arial", 12,"bold"),fg_color=color_btn,hover_color=color_btn_hover)
-            btnLinkWeb = ctk.CTkButton(frameBTN,text="Web site",command= lambda :  wb.open(linkWeb),
-                                       font=("Arial", 12,"bold"),fg_color=color_btn,hover_color=color_btn_hover)
-
-            labelIcon.place(relx=0.5, rely=0.0, anchor="n")
-            labelSoft.pack()
-            labelVersion.pack()
-            labelCopy.place(relx=0.5, rely=1.0, anchor="s")
-
-            frameLabel.place(relx=0.5, rely=0.5, anchor="center")
-            mainFrame.pack(side="top")
-            frameBTN.pack(side ="bottom")
+    def changePoliceLabel(self, font: (str, int, str) = ("Roboto", 15, "bold")):
+        self.__label.configure(font=font)
 
 
-            btnLinkSource.place(relx=1, rely=1, anchor='se')
-            btnLinkWeb.place(relx=0, rely=1, anchor='sw')
+class aOptionMenu(placement_Tool_Kit_internet, ctk.CTkOptionMenu):
+    def __init__(self, master, value: list, police_size: int = 15, bg: str = "", fg: str = "", width: int = 200,
+                 **kwargs):
+        self.__var = StringVar()
+
+        super().__init__(master, values=value, variable=self.__var, **kwargs)
+
+        if bg != "":
+            self.configure(fg_color=bg)
+
+        if fg != "":
+            self.configure(text_color=fg)
+
+        self.configure(font=("Roboto", police_size, "bold"))
+
+        self.__var.set(value[0])
+
+    def getValue(self):
+        return self.__var.get()
+
+    def changeColor(self, bg: str = "", fg: str = ""):
+        if bg != "":
+            self.configure(fg_color=bg)
+
+        if fg != "":
+            self.configure(text_color=fg)
+
+    def changePolice(self, font: (str, int, str) = ("Roboto", 15, "bold")):
+        self.configure(font=font)
+
+    def set_text(self, text: str):
+        self.__var.set(text)
+
+
+class aOptionMenuLengend(placement_Tool_Kit_internet, ctk.CTkFrame):
+    def __init__(self, master, values: list, text: str = "Arrera OptionMenu Legend", bg: str = "", fg: str = "",
+                 police_size: int = 15, gridUsed: bool = False):
+        super().__init__(master)
+        text = text + ":  "
+        self.__label = aLabel(self, text=text, font=("Roboto", police_size, "bold"))
+
+        self.configure(fg_color=master.cget("fg_color"))
+
+        if bg != "":
+            self.__label.configure(fg_color=bg)
         else :
-            apropos = Toplevel()
-            apropos.title("A propos : " + nameSoft)
-            apropos.configure(bg=self.__windowsColor)
-            apropos.maxsize(400, 300)
-            apropos.minsize(400, 300)
-            icon = ctk.CTkImage(light_image=Image.open(iconFile), size=(100, 100))
-            mainFrame = Frame(apropos, width=400, height=250,bg=self.__windowsColor)
-            frameBTN = Frame(apropos, width=400, height=50,bg=self.__windowsColor)
-            frameLabel = Frame(apropos,bg=self.__windowsColor)
+            self.__label.configure(fg_color=master.cget("fg_color"))
 
-            # Traitement Image
-            labelIcon = Label(mainFrame, bg=self.__windowsColor)
-            imageOrigine = Image.open(iconFile)
-            imageRedim = imageOrigine.resize((100,100))
-            icon = ImageTk.PhotoImage(imageRedim, master=labelIcon)
-            labelIcon.image_names = icon
-            labelIcon.configure(image=icon)
+        if fg != "":
+            self.__label.configure(text_color=fg)
 
-            labelSoft = Label(frameLabel, text=nameSoft + " version " + version, font=("Arial", 20),bg=self.__windowsColor,fg=self.__textColor)
-            labelVersion = Label(frameLabel, text="Arrera TK version " + VERSIONARRERATK, font=("Arial", 13),bg=self.__windowsColor,fg=self.__textColor)
-            labelCopy = Label(mainFrame, text=copyright, font=("Arial", 13),bg=self.__windowsColor,fg=self.__textColor)
+        self.__optionMenu = aOptionMenu(self, value=values, police_size=police_size, bg=bg, fg=fg)
 
-            btnLinkSource = Button(frameBTN, text="Source code", command=lambda: wb.open(linkSource),bg=self.__windowsColor,fg=self.__textColor)
-            btnLinkWeb = Button(frameBTN, text="Web site", command=lambda: wb.open(linkWeb),bg=self.__windowsColor,fg=self.__textColor)
+        if gridUsed:
+            self.grid_columnconfigure(0, weight=0)
+            self.grid_columnconfigure(1, weight=1)
+            self.grid_rowconfigure(0, weight=0)
+            self.__label.grid(row=0, column=0, sticky="w", padx=(8, 6), pady=6)
+            self.__optionMenu.grid(row=0, column=1, sticky="ew", padx=(6, 8), pady=6)
+        else:
+            self.__label.pack(side="left")
+            self.__optionMenu.pack(side="right")
 
-            labelIcon.place(relx=0.5, rely=0.0, anchor="n")
-            labelSoft.pack()
-            labelVersion.pack()
-            labelCopy.place(relx=0.5, rely=1.0, anchor="s")
+    def getOptionMenu(self):
+        return self.__optionMenu
 
-            frameLabel.place(relx=0.5, rely=0.5, anchor="center")
-            mainFrame.pack(side="top")
-            frameBTN.pack(side="bottom")
+    def getValue(self):
+        return self.__optionMenu.getValue()
 
-            btnLinkSource.place(relx=1, rely=1, anchor='se')
-            btnLinkWeb.place(relx=0, rely=1, anchor='sw')
+    def changeColorLabel(self, bg: str = "", fg: str = ""):
+        if bg != "":
+            self.__label.configure(fg_color=bg)
 
-    # Methode pour recuperer le theme actuel de l'application
+        if fg != "":
+            self.__label.configure(text_color=fg)
 
-    def getTheme(self):
-        return ctk.get_appearance_mode()
+    def changeTextLabel(self, text: str):
+        self.__label.configure(text=text)
+
+    def set_text(self, text: str):
+        self.__optionMenu.set_text(text)
+
+    def changePoliceLabel(self, font: (str, int, str) = ("Roboto", 15, "bold")):
+        self.__label.configure(font=font)
+
+
+class aHourPickers(placement_Tool_Kit_internet, ctk.CTkFrame):
+    def __init__(self, master,minute_pickers:bool = False, **kwargs):
+        super().__init__(master,fg_color=master.cget("fg_color"),**kwargs)
+
+        if not minute_pickers:
+            hours = [f"{h:02d}" for h in range(24)]
+        else :
+            hours = [f"{h:02d}" for h in range(60)]
+
+        minutes = [f"{m:02d}" for m in range(60)]
+
+        self.__hour = aOptionMenu(self, value=hours, width=10)
+        self.__minute = aOptionMenu(self, value=minutes, width=10)
+
+        label = aLabel(self, text=" : ", font=("Roboto", 20, "bold"))
+
+        self.__hour.pack(side="left")
+        label.pack(side="left")
+        self.__minute.pack(side="left")
+
+    def getValueHour(self):
+        return self.__hour.getValue()
+
+    def getValueMinute(self):
+        return self.__minute.getValue()
+
+    def setValueMinute(self, minute:str):
+        self.__minute.set(minute)
+
+    def setValueHour(self,hour:str):
+        self.__hour.set(hour)
+
+
+class aSwicht(placement_Tool_Kit_internet, ctk.CTkSwitch):
+    def __init__(self, master, text="Arrera Button Swicht", default_value: bool = False, **kwargs):
+        self.__var = BooleanVar(value=default_value)
+        super().__init__(master, text=text, variable=self.__var, onvalue=True, offvalue=False, **kwargs)
+        self.configure(font=("Roboto", 15, "bold"))
+
+    def setOn(self):
+        self.__var.set(True)
+
+    def setOff(self):
+        self.__var.set(False)
+
+    def getValue(self):
+        return self.__var.get()
+
+    def change_text(self, text=""):
+        if text != "":
+            self.configure(text=text)
+
+
+# Frame / Canvas
+
+class aFrame(placement_Tool_Kit_internet, ctk.CTkFrame):
+    def __init__(self, master, corner_radius: int = 20, **kwargs):
+        super().__init__(master, **kwargs)
+        self.configure(corner_radius=corner_radius)
+
+
+class aScrollableFrame(placement_Tool_Kit_internet, ctk.CTkScrollableFrame):
+    def __init__(self, master, corner_radius: int = 20, **kwargs):
+        super().__init__(master, **kwargs)
+        self.configure(corner_radius=corner_radius)
+
+
+class aCanvas(ctk.CTkCanvas):
+    def __init__(self, master):
+        super().__init__(master)
+
+
+class aBackgroundImage(ctk.CTkFrame):
+    def __init__(self, master, background_light: str, background_dark: str = "", height: int = 600, width: int = 800,
+                 **kwargs):
+        super().__init__(master, **kwargs)
+
+        self.__size = (width, height)
+        self.configure(width=width, height=height, border_width=0)
+
+        # Création de l'image initiale
+        background = self._create_ctk_image(background_light, background_dark)
+
+        # Sauvegarde de l'image pour éviter le garbage collection
+        self.__current_image = background
+
+        # Utilisation d'un CTkLabel pour afficher l'image
+        # Note: Assure-toi que aLabel accepte l'argument 'image' ou utilise ctk.CTkLabel
+        self.__label = ctk.CTkLabel(self, text="", image=background)
+        self.__label.place(relx=0.5, rely=0.5, anchor='center')
+
+    def _create_ctk_image(self, light_path: str, dark_path: str):
+        """Méthode interne pour générer l'objet CTkImage correctement"""
+        # Si dark_path est vide, on utilise l'image light pour les deux modes
+        path_for_dark = dark_path if dark_path != "" else light_path
+
+        return ctk.CTkImage(
+            light_image=Image.open(resource_path(light_path)),
+            dark_image=Image.open(resource_path(path_for_dark)),
+            size=self.__size
+        )
+
+    def change_background(self, background_light: str, background_dark: str = ""):
+        """Permet de changer dynamiquement les images de fond"""
+        new_background = self._create_ctk_image(background_light, background_dark)
+
+        # Sauvegarde de la nouvelle image pour éviter le garbage collection
+        self.__current_image = new_background
+
+        self.__label.configure(image=new_background)
+
+
+# Fenetre
+
+class aTk(ctk.CTk):
+    def __init__(self, title: str = "ArreraTK", width: int = 800, height: int = 600, resizable: bool = False,
+                 icon: str = "", theme_file: str = "theme/theme_default.json", **kwargs):
+        super().__init__(**kwargs)
+        ctk.set_appearance_mode("System")
+        try:
+            ctk.set_default_color_theme(resource_path(theme_file))
+        except Exception as e:
+            print(e)
+            ctk.set_default_color_theme("dark-blue")
+
+        self.geometry(f"{width}x{height}")
+        self.title(title)
+        self.resizable(resizable, resizable)
+
+        if icon != "":
+            icon = resource_path(icon)
+            if platform.system() == "Windows":
+                if os.path.splitext(icon)[1].lower() == '.ico':
+                    self.iconbitmap(icon)
+            elif os.path.splitext(icon)[1].lower() == '.png':
+                self.iconphoto(True, PhotoImage(file=icon))
+
+
+class aTopLevel(ctk.CTkToplevel):
+    def __init__(self, title: str = "Arrera TopLevel", width: int = 400, height: int = 300, resizable: bool = False,
+                 icon: str = "", **kwargs):
+        super().__init__(**kwargs)
+
+        self.geometry(f"{width}x{height}")
+        self.title(title)
+        self.resizable(resizable, resizable)
+
+        if icon != "":
+            icon = resource_path(icon)
+            if platform.system() == "Windows":
+                if os.path.splitext(icon)[1].lower() == '.ico':
+                    self.iconbitmap(icon)
+            elif os.path.splitext(icon)[1].lower() == '.png':
+                self.iconphoto(True, PhotoImage(file=icon))
+
+
+class windows_about(ctk.CTkToplevel):
+    def __init__(self, nameSoft: str, iconFile: str, version: str, copyright: str, linkSource: str, linkWeb: str):
+        super().__init__()
+        self.title("A propos : " + nameSoft)
+        self.maxsize(400, 300)
+        self.minsize(400, 300)
+
+        icon = ctk.CTkImage(light_image=Image.open(resource_path(iconFile)), size=(100, 100))
+        mainFrame = aFrame(self, width=400, height=250, border_width=0, corner_radius=0)
+        frameBTN = aFrame(self, width=400, height=50, border_width=0, corner_radius=0)
+        frameLabel = aFrame(self, border_width=0, corner_radius=0)
+
+        labelIcon = aLabel(mainFrame, image=icon, text="")
+        labelSoft = aLabel(frameLabel, text=nameSoft + " version " + version, font=("Roboto", 20))
+        labelVersion = aLabel(frameLabel, text="Arrera TK version " + VERSIONARRERATK, font=("Roboto", 13))
+        labelCopy = aLabel(mainFrame, text=copyright, font=("Roboto", 13))
+
+        btnLinkSource = aButton(frameBTN, text="Source code", command=lambda: wb.open(linkSource),
+                                font=("Roboto", 13, "bold"))
+        btnLinkWeb = aButton(frameBTN, text="Web site", command=lambda: wb.open(linkWeb),
+                             font=("Roboto", 13, "bold"))
+
+        labelIcon.placeTopCenter()
+        labelSoft.pack()
+        labelVersion.pack()
+        labelCopy.placeBottomCenter()
+
+        frameLabel.placeCenter()
+        mainFrame.pack(side="top")
+        frameBTN.pack(side="bottom")
+
+        btnLinkSource.placeRightCenter()
+        btnLinkWeb.placeLeftCenter()
+
+
+def placeLeftTop(widget):
+    widget.place(relx=0, rely=0, anchor='nw')
+
+
+def placeRightTop(widget):
+    widget.place(relx=1, rely=0, anchor='ne')
+
+
+def placeLeftBottom(widget):
+    widget.place(relx=0, rely=1, anchor='sw')
+
+
+def placeRightBottom(widget):
+    widget.place(relx=1, rely=1, anchor='se')
+
+
+def placeCenter(widget):
+    widget.place(relx=0.5, rely=0.5, anchor='center')
+
+
+def placeLeftCenter(widget):
+    widget.place(relx=0, rely=0.5, anchor='w')
+
+
+def placeRightCenter(widget):
+    widget.place(relx=1, rely=0.5, anchor='e')
+
+
+def placeTopCenter(widget):
+    widget.place(relx=0.5, rely=0, anchor='n')
+
+
+def placeBottomCenter(widget):
+    widget.place(relx=0.5, rely=1, anchor='s')
+
+
+def placeCenterOnWidth(widget, y: int = 0):
+    if y == 0:
+        return
+    else:
+        widget.place(relx=0.5, y=y, anchor='n')
+
+
+def placeWidgetCenteredAtBottom(widget, x_offset=1):
+    widget.place(relx=0.5, rely=1, x=-x_offset, anchor="s")
+
+
+def placeBottomRight(widget):
+    widget.place(relx=1, rely=1, anchor='se')
+
+
+def placeBottomLeft(widget):
+    widget.place(relx=0, rely=1, anchor='sw')
+
+
+def placeTopRight(widget):
+    widget.place(relx=1, rely=0, anchor='ne')
+
+
+def placeTopLeft(widget):
+    widget.place(relx=0, rely=0, anchor='nw')
+
+
+def placeCenterRight(widget):
+    widget.place(relx=1, rely=0.5, anchor='e')
+
+
+def placeCenterLeft(widget):
+    widget.place(relx=0, rely=0.5, anchor='w')
+
+
+def placeLeftBottomNoStick(widget):
+    widget.place(relx=0, rely=1, anchor='sw', x=10, y=-10)
+
+
+def placeRightBottomNoStick(widget):
+    widget.place(relx=1, rely=1, anchor='se', x=-10, y=-10)
+
+
+def placeBottomCenterNoStick(widget):
+    widget.place(relx=0.5, rely=1, anchor='s', x=0, y=-10)
+
+
+# Pack
+
+def pack(widget, xExpand: bool = False, yExpand: bool = False):
+    if xExpand and yExpand:
+        widget.pack(expand=True, fill="both")
+    elif xExpand:
+        widget.pack(expand=True, fill="x")
+    elif yExpand:
+        widget.pack(expand=True, fill="y")
+    else:
+        widget.pack()
+
+
+def packLeft(widget, xExpand: bool = False, yExpand: bool = False):
+    if xExpand and yExpand:
+        widget.pack(expand=True, fill="both", side="left")
+    elif xExpand:
+        widget.pack(expand=True, fill="x", side="left")
+    elif yExpand:
+        widget.pack(expand=True, fill="y", side="left")
+    else:
+        widget.pack(side="left")
+
+
+def packRight(widget, xExpand: bool = False, yExpand: bool = False):
+    if xExpand and yExpand:
+        widget.pack(expand=True, fill="both", side="right")
+    elif xExpand:
+        widget.pack(expand=True, fill="x", side="right")
+    elif yExpand:
+        widget.pack(expand=True, fill="y", side="right")
+    else:
+        widget.pack(side="right")
+
+
+def packTop(widget, xExpand: bool = False, yExpand: bool = False):
+    if xExpand and yExpand:
+        widget.pack(expand=True, fill="both", side="top")
+    elif xExpand:
+        widget.pack(expand=True, fill="x", side="top")
+    elif yExpand:
+        widget.pack(expand=True, fill="y", side="top")
+    else:
+        widget.pack(side="top")
+
+
+def packBottom(widget, xExpand: bool = False, yExpand: bool = False):
+    if xExpand and yExpand:
+        widget.pack(expand=True, fill="both", side="bottom")
+    elif xExpand:
+        widget.pack(expand=True, fill="x", side="bottom")
+    elif yExpand:
+        widget.pack(expand=True, fill="y", side="bottom")
+    else:
+        widget.pack(side="bottom")
+
+# Objet pour gerer les touche de clavier
+
+class keyboad_manager:
+    def __init__(self,master:Union[aTk,aTopLevel]):
+        self.__dict_key_fonction = {}# Shema key:fonction
+        self.__w = master
+
+    def __gest_keyboad(self, event):
+        if event.keycode in self.__dict_key_fonction:
+            self.__dict_key_fonction[event.keycode]()
+
+    def add_key(self,key:int,fonction:Callable):
+        if not self.__dict_key_fonction:
+            self.__w.bind("<Key>",self.__gest_keyboad)
+
+        self.__dict_key_fonction[key] = fonction

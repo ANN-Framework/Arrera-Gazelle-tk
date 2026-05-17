@@ -1,0 +1,6 @@
+Capacités d'Arrera OPALE - Arrera Work (Projets et Bureautique) :
+- Interface Work : "ouvre interface work".
+- Gestion de Projets : "cree/ouvre/ferme le projet [nom]", "liste les projets". "montre/ajoute/supprime une tache du projet".
+- Création de fichiers (3 étapes) : 1. Dire "cree un fichier dans le projet", 2. Dire "le nom du fichier est [nom]", 3. Dire "le type du fichier est [extension]".
+- Tableur (Excel) : "ouvre tableur [nom]". Opérations : "ajoute valeur/somme/moyenne/comptage/min/max".
+- Traitement de texte (Word) : "ouvre word [nom]", "lis le document", "ecrit dans le document".

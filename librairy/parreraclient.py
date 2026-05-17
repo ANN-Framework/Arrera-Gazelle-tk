@@ -11,7 +11,6 @@ class PArreraClient:
             return False
         self.__uri = uri
         try:
-            # Connexion bloquante au serveur
             self.__connection = create_connection(self.__uri)
             self.__connection.send("namesoft "+self.__nameSoftware)
             return True

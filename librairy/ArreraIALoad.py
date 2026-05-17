@@ -14,7 +14,7 @@ class ArreraIALoad:
         self.__classes = None
         self.__is_loaded = False
         self.__system_context_is_loaded = False
-        self.__system_context = ""
+        self.__system_instructions = []
 
     # Methode private
     """
@@ -42,13 +42,19 @@ class ArreraIALoad:
         return predicted_tag, float(confidence)
     """
 
-    def __predict_gguf_model(self, prompt, max_tokens=512):
-        consigne_langue = "\n\n(Réponds impérativement en français, même si je parle anglais ou technique)."
-        if self.__system_context_is_loaded:
-            content = f"{self.__system_context}\n\nInstruction utilisateur : {prompt}{consigne_langue}"
-            messages = [{"role": "user", "content": content}]
-        else:
-            messages = [{"role": "user", "content": prompt + consigne_langue}]
+    def __predict_gguf_model(self, prompt, max_tokens=512,enable_consigne_langue:bool=True):
+        if enable_consigne_langue:
+            consigne_langue = "\n\n(Réponds impérativement en français, même si je parle anglais ou technique)."
+        else :
+            consigne_langue = ""
+        messages = []
+
+        if self.__system_context_is_loaded and len(self.__system_instructions) > 0:
+            combined_system_prompt = "Utilise les informations suivantes pour aider l'utilisateur :\n\n"
+            combined_system_prompt += "\n\n---\n\n".join(self.__system_instructions)
+            messages.append({"role": "system", "content": combined_system_prompt})
+
+        messages.append({"role": "user", "content": prompt + consigne_langue})
 
         output = self.__model.create_chat_completion(
             messages=messages,
@@ -79,24 +85,37 @@ class ArreraIALoad:
             raise ValueError(f"Erreur lors du chargement du chatbot : {e}")
     """
 
+    def add_system_instruction(self, file_instruction: str):
+        if not os.path.exists(file_instruction):
+            return False
+
+        try :
+            with open(file_instruction, 'r', encoding='utf-8') as f:
+                instruction = f.read()
+
+            self.__system_instructions.append(instruction)
+            self.__system_context_is_loaded = True
+            return True
+        except :
+            return False
+
+
     def load_help_file(self, file_path: str):
         if os.path.exists(file_path):
-            try :
+            try:
                 with open(file_path, 'r', encoding='utf-8') as f:
                     content = f.read()
-                    self.__system_context = f"Utilise les informations suivantes pour aider l'utilisateur :\n\n{content}"
-                    self.__system_context_is_loaded = True
+                    self.add_system_instruction(content)
                 return True
-            except :
-                self.__system_context_is_loaded = False
+            except Exception as e:
+                print(f"Erreur de lecture : {e}")
                 return False
         else:
-            self.__system_context_is_loaded = False
             return False
 
     def unload_help(self):
         self.__system_context_is_loaded = False
-        self.__system_context = ""
+        self.__system_instructions = []
 
     def load_model_gguf(self, model_path:str, n_ctx:int=2048):
         if not os.path.exists(model_path):
@@ -116,10 +135,10 @@ class ArreraIALoad:
         except Exception as e:
             raise ValueError(f"Erreur lors du chargement : {e}")
 
-    def send_request(self, sentence: str, confidence_threshold: float = 0.70):
+    def send_request(self, sentence: str, confidence_threshold: float = 0.70,consigne_langue: bool = False):
         if self.__model_type == LISTMODELSUPPROT[0]:
             return None, 0.0
         elif self.__model_type == LISTMODELSUPPROT[1]:
-            return self.__predict_gguf_model(sentence)
+            return self.__predict_gguf_model(sentence,512,consigne_langue)
         else:
             return None, 0.0

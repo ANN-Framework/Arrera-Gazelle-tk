@@ -449,11 +449,17 @@ class gestUserSetting:
     def get_list_model_ia_available(self):
         return self.__gestionnaire.getGestIA().get_list_model_available()
 
+    def get_model_ia_on_directory(self):
+        return self.__gestionnaire.getGestIA().get_list_model_on_dir()
+
     def get_data_model_ia_available(self,model:str):
         return self.__gestionnaire.getGestIA().gest_data_model(model)
 
     def download_ia_model(self,model:str):
         return self.__gestionnaire.getGestIA().download_model(model)
+
+    def del_ia_model(self,model:str):
+        return self.__gestionnaire.getGestIA().del_model(model)
 
     def get_model_downloaded(self):
         return self.__gestionnaire.getGestIA().get_list_model_download()

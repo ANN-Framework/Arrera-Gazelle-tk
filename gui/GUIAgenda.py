@@ -5,6 +5,9 @@ from gui.guibase import GuiBase,gestionnaire
 from tkcalendar import Calendar
 from datetime import date,datetime
 
+from librairy.arrera_tk import *
+
+
 class GUIAgenda(GuiBase):
     def __init__(self, gest: gestionnaire):
         super().__init__(gest, "Agenda")
@@ -13,29 +16,26 @@ class GUIAgenda(GuiBase):
         self.__dateSelected = None
 
     def _mainframe(self):
-        self.__varHour = StringVar(self._screen)
-        self.__varMinute = StringVar(self._screen)
-        self.__varSuppr = StringVar(self._screen)
+
         self.__varCheckHour = BooleanVar(value=False)
         # Config de la fenetre
         self._screen.rowconfigure(0, weight=1)
         self._screen.columnconfigure(0, weight=1)
         # Creation des frames Maitre
-        self.__frameMain = self._arrtk.createFrame(self._screen)
-        self.__frameAddEvent = self._arrtk.createFrame(self._screen)
-        self.__frameSuppr = self._arrtk.createFrame(self._screen)
+        self.__frameMain = aFrame(self._screen)
+        self.__frameAddEvent = aFrame(self._screen)
+        self.__frameSuppr = aFrame(self._screen)
         # Frame fille
-        frameLogoTitle = self._arrtk.createFrame(self.__frameMain)
-        frameBTNEvent = self._arrtk.createFrame(self.__frameMain)
-        frameEventDay = self._arrtk.createFrame(self.__frameMain,wightBoder=2)
-        frameCalendar = self._arrtk.createFrame(self.__frameMain)
+        frameLogoTitle = aFrame(self.__frameMain)
+        frameBTNEvent = aFrame(self.__frameMain)
+        frameEventDay = aFrame(self.__frameMain)
+        frameCalendar = aFrame(self.__frameMain)
 
-        self.__frameAdd = self._arrtk.createFrame(self.__frameAddEvent)
-        frameBTNFAdd = self._arrtk.createFrame(self.__frameAdd)
-        self.__frameHeure = self._arrtk.createFrame(self.__frameAddEvent)
+        self.__frameAdd = aFrame(self.__frameAddEvent)
+        frameBTNFAdd = aFrame(self.__frameAdd)
+        self.__frameHeure = aFrame(self.__frameAddEvent)
 
-        frameBTNSuppr = self._arrtk.createFrame(self.__frameSuppr)
-
+        frameBTNSuppr = aFrame(self.__frameSuppr)
         # Configuration des frames
         # Frame Main
         self.__frameMain.columnconfigure(0, weight=0)
@@ -102,26 +102,22 @@ class GUIAgenda(GuiBase):
 
         # Frame Add Event
         # Asset
-        assetLogo = self._arrtk.createImage(pathLight=self.__assetPath+"calendar.png",
-                                       pathDark=self.__assetPath+"calendar.png",
-                                       tailleX=64, tailleY=64)
+        assetLogo = aImage(path_light=self.__assetPath+"calendar.png",
+                                       path_dark=self.__assetPath+"calendar.png",
+                                       width=64, height=64)
 
         # Widget
         # Frame Main
         # Logo et titre
-        lLogoApp = self._arrtk.createLabel(frameLogoTitle,image=assetLogo)
-        lTitleApp = self._arrtk.createLabel(frameLogoTitle,
-                                            text=self._gestionnaire.getName()+" : Agenda",
-                                            ppolice="Arial", ptaille=20, pstyle="bold")
+        lLogoApp = aLabel(frameLogoTitle,image=assetLogo)
+        lTitleApp = aLabel(frameLogoTitle,
+                           text=self._gestionnaire.getName()+" : Agenda",
+                           police_size=20)
 
         # Boutons
-        btnCreateEvent = self._arrtk.createButton(frameBTNEvent,text="Créer\nun événement",
-                                                  ppolice="Arial",ptaille=15,pstyle="bold",
-                                                  bg=self._btnColor,fg=self._btnTexteColor,
-                                                  command=lambda : self.__viewAddEvent(0))
-        btnSupprimerEvent = self._arrtk.createButton(frameBTNEvent, text="Supprimer\nun événement",
-                                                  ppolice="Arial", ptaille=15, pstyle="bold",
-                                                  bg=self._btnColor, fg=self._btnTexteColor,
+        btnCreateEvent = aButton(frameBTNEvent,text="Créer\nun événement",size=15,
+                                                  command=self.__viewAddEvent)
+        btnSupprimerEvent = aButton(frameBTNEvent, text="Supprimer\nun événement",size=15,
                                                      command=self.__viewSuppr)
 
         # Calendrier
@@ -130,50 +126,35 @@ class GUIAgenda(GuiBase):
             borderwidth=0)
 
         # Jour
-        self.__labelDate = self._arrtk.createLabel(frameEventDay,text="DATE",ppolice="Arial", ptaille=30, pstyle="bold")
-        self.__labelEvent = self._arrtk.createLabel(frameEventDay,text="EVENT",ppolice="Arial", ptaille=20, pstyle="bold")
-        self.__btnAddEventDay = self._arrtk.createButton(frameEventDay,text="Ajouter un événement",
-                                                    ppolice="Arial", ptaille=25,bg=self._btnColor,
-                                                         fg=self._btnTexteColor,command=lambda : self.__viewAddEvent(1))
+        self.__labelDate = aLabel(frameEventDay,text="DATE",police_size=20)
+        self.__labelEvent = aLabel(frameEventDay,text="EVENT",police_size=20)
 
         # Frame Add Event
-        self.__labelTitleAddEvent = self._arrtk.createLabel(self.__frameAdd,
-                                                            text="Ajouter un événement",
-                                                            ppolice="Arial", ptaille=30, pstyle="bold")
+        self.__labelTitleAddEvent = aLabel(self.__frameAdd,text="Ajouter un événement",police_size=30)
         self.__calendarAddEvent = Calendar(self.__frameAdd,selectmode="day",year=date.today().year,
                                            month=date.today().month,locale="fr_FR",firstweekday="monday",
                                            showweeknumbers=False,borderwidth=0,date_pattern="yyyy-mm-dd")
-        self.__labelDateSelected = self._arrtk.createLabel(self.__frameAdd,ppolice="Arial", ptaille=15)
-        wEntryName,self.__entryNameEvent = self._arrtk.createEntryLegend(self.__frameAdd,text="Titre : ",ppolice="Arial", ptaille=20,gridUsed=True)
-        wEntryDescription,self.__entryDescriptionEvent = self._arrtk.createEntryLegend(self.__frameAdd,ppolice="Arial", ptaille=20,text="Description : ",gridUsed=True)
-        wEntryLieu,self.__entryLieuEvent = self._arrtk.createEntryLegend(self.__frameAdd,ppolice="Arial", ptaille=20,text="Lieu :",gridUsed=True)
-        self.__checkHour = self._arrtk.createCheckbox(self.__frameAdd,text="Définir une heure",var_chk=self.__varCheckHour)
+        self.__labelDateSelected = aLabel(self.__frameAdd,police_size=20)
+        self.__entryNameEvent = aEntryLengend(self.__frameAdd,text="Titre : ",police_size=20,gridUsed=True)
+        self.__entryDescriptionEvent = aEntryLengend(self.__frameAdd,police_size=20,text="Description : ",gridUsed=True)
+        self.__entryLieuEvent = aEntryLengend(self.__frameAdd,police_size=20,text="Lieu :",gridUsed=True)
+        self.__checkHour = ctk.CTkCheckBox(self.__frameAdd,text="Définir une heure",variable=self.__varCheckHour)
 
-        btnAddEvent = self._arrtk.createButton(frameBTNFAdd,text="Ajouter",
-                                              ppolice="Arial", ptaille=20,command=self.__addNewEvent,
-                                              bg=self._btnColor, fg=self._btnTexteColor)
-
-        btnCancelEvent = self._arrtk.createButton(frameBTNFAdd,text="Annuler",
-                                               ppolice="Arial", ptaille=20,command=self.__backToMain,
-                                               bg=self._btnColor, fg=self._btnTexteColor)
+        btnAddEvent = aButton(frameBTNFAdd,text="Ajouter",size=20,command=self.__addNewEvent)
+        btnCancelEvent = aButton(frameBTNFAdd,text="Annuler",size=20,command=self.__backToMain)
 
         # Partie hour
-        labelHour = self._arrtk.createLabel(self.__frameHeure,text="Selectionner l'heure",ppolice="Arial", ptaille=30,pstyle="bold")
-        hourPicker = self._arrtk.createHourPickert(self.__frameHeure,self.__varHour,self.__varMinute)
-        self.__btnValiderHour = self._arrtk.createButton(self.__frameHeure,text="Valider",ppolice="Arial", ptaille=15,
-                                                 bg=self._btnColor, fg=self._btnTexteColor)
-        btnCancelHour = self._arrtk.createButton(self.__frameHeure,text="Annuler",ppolice="Arial", ptaille=15,
-                                                 bg=self._btnColor, fg=self._btnTexteColor,command=self.__backToMain)
-        # Partie suppr
-        labelSuppr = self._arrtk.createLabel(self.__frameSuppr,text="Supprimer un événement",ppolice="Arial", ptaille=30,pstyle="bold")
-        self.__selectMenuSuppr = None
-        btnSupprEvent = self._arrtk.createButton(frameBTNSuppr,text="Supprimer",
-                                                 ppolice="Arial", ptaille=20,command=self.__supprEvent,
-                                                 bg=self._btnColor, fg=self._btnTexteColor)
-        btnCancelSuppr = self._arrtk.createButton(frameBTNSuppr,text="Annuler",
-                                                  ppolice="Arial", ptaille=20,command=self.__backToMain,
-                                                    bg=self._btnColor, fg=self._btnTexteColor)
+        labelHour = aLabel(self.__frameHeure,text="Selectionner l'heure",police_size=20)
 
+        self.__hour_picker = aHourPickers(self.__frameHeure)
+
+        self.__btnValiderHour = aButton(self.__frameHeure,text="Valider",size=15)
+        btnCancelHour = aButton(self.__frameHeure,text="Annuler",size=15,command=self.__backToMain)
+        # Partie suppr
+        labelSuppr = aLabel(self.__frameSuppr,text="Supprimer un événement",police_size=20)
+        self.__selectMenuSuppr = None
+        btnSupprEvent = aButton(frameBTNSuppr,text="Supprimer",size=20,command=self.__supprEvent)
+        btnCancelSuppr = aButton(frameBTNSuppr,text="Annuler",size=20,command=self.__backToMain)
         # Placement des frames
         frameEventDay.grid(row=0, column=1, rowspan=3, sticky="nsew", padx=0, pady=0)
         frameLogoTitle.grid(row=0, column=0, sticky="nw", padx=0, pady=0)
@@ -192,20 +173,19 @@ class GUIAgenda(GuiBase):
         # Jour
         self.__labelDate.grid(row=0, column=0, sticky="nw", padx=10, pady=(10, 5))
         self.__labelEvent.grid(row=1, column=0, sticky="w",  padx=10, pady=(0, 10))
-        self.__btnAddEventDay.grid(row=2, column=0, sticky="s", padx=10, pady=10)
 
         # Ajout Event
         self.__labelTitleAddEvent.grid(row=0, column=0, sticky="ew", padx=12, pady=(12, 6))
-        wEntryName.grid(row=2, column=0, sticky="ew", padx=12, pady=6)
-        wEntryDescription.grid(row=3, column=0, sticky="ew", padx=12, pady=6)
-        wEntryLieu.grid(row=4, column=0, sticky="ew", padx=12, pady=6)
+        self.__entryNameEvent.grid(row=2, column=0, sticky="ew", padx=12, pady=6)
+        self.__entryDescriptionEvent.grid(row=3, column=0, sticky="ew", padx=12, pady=6)
+        self.__entryLieuEvent.grid(row=4, column=0, sticky="ew", padx=12, pady=6)
         self.__checkHour.grid(row=5, column=0, sticky="ew", padx=12, pady=6)
         btnCancelEvent.grid(row=0, column=0, sticky="w", padx=(10, 6), pady=8)
-        btnAddEvent.grid(   row=0, column=2, sticky="e", padx=(6, 10), pady=8)
+        btnAddEvent.grid(row=0, column=2, sticky="e", padx=(6, 10), pady=8)
         frameBTNFAdd.grid(row=7, column=0, sticky="sew", padx=12, pady=12)
 
         labelHour.grid(row=0, column=0, columnspan=3, sticky="n", pady=(10, 5))               # haut-centre
-        hourPicker.grid(row=1, column=1, sticky="")                               # centre-centre
+        self.__hour_picker.grid(row=1, column=1, sticky="")                               # centre-centre
         btnCancelHour.grid(row=2, column=0, sticky="w", padx=10, pady=(5, 10))    # bas-gauche
         self.__btnValiderHour.grid(row=2, column=2, sticky="e", padx=10, pady=(5, 10))  # bas-droite
 
@@ -253,17 +233,12 @@ class GUIAgenda(GuiBase):
         date = self.__miniCalendar.get_date()
         self.__viewEventDay(datetime.strptime(date, "%d/%m/%Y").strftime("%Y-%m-%d"))
 
-    def __viewAddEvent(self,mode:int):
+    def __viewAddEvent(self):
 
         self.__calendarAddEvent.grid_forget()
         self.__labelDateSelected.grid_forget()
 
-        match mode :
-            case 0:
-                self.__calendarAddEvent.grid(row=1, column=0, sticky="n",  padx=12, pady=6)
-            case 1 :
-                self.__labelDateSelected.configure(text="Date sélectionnée : "+self.__dateSelected)
-                self.__labelDateSelected.grid(row=1, column=0, sticky="n",  padx=12, pady=6)
+        self.__calendarAddEvent.grid(row=1, column=0, sticky="n",  padx=12, pady=6)
 
         self.__frameMain.grid_forget()
         self.__frameHeure.grid_forget()
@@ -272,18 +247,18 @@ class GUIAgenda(GuiBase):
         self._screen.update()
 
     def __addNewEvent(self):
-        name = self.__entryNameEvent.get()
+        name = self.__entryNameEvent.getEntry().get()
         if name == "" :
             showerror("Erreur",
                       "Le nom de l'événement ne peut pas être vide")
             return False
-        description = self.__entryDescriptionEvent.get()
-        lieu = self.__entryLieuEvent.get()
+        description = self.__entryDescriptionEvent.getEntry().get()
+        lieu = self.__entryLieuEvent.getEntry().get()
 
         # Clear des champs
-        self.__entryNameEvent.delete(0, 'end')
-        self.__entryDescriptionEvent.delete(0, 'end')
-        self.__entryLieuEvent.delete(0, 'end')
+        self.__entryNameEvent.getEntry().delete(0, 'end')
+        self.__entryDescriptionEvent.getEntry().delete(0, 'end')
+        self.__entryLieuEvent.getEntry().delete(0, 'end')
 
         if self.__dateSelected is not None:
             date = datetime.strptime(self.__dateSelected, "%Y-%m-%d").date()
@@ -296,7 +271,8 @@ class GUIAgenda(GuiBase):
             self.__btnValiderHour.configure(command = lambda :
             self.__fncAgenda.addEventToCalendar(name=name, date=date,
                                                 descrption=description, lieu=lieu,
-                                                heure=str(self.__varHour.get()+":"+self.__varMinute.get()))
+                                                heure=str(self.__hour_picker.getValueHour()+":"+
+                                                          self.__hour_picker.getValueMinute()))
             and self.__backToMain())
             return True
 
@@ -317,9 +293,7 @@ class GUIAgenda(GuiBase):
             showerror("Erreur","Aucun événement à supprimer")
             return False
 
-        self.__selectMenuSuppr = self._arrtk.createOptionMenu(self.__frameSuppr,
-                                                              value=listEvent,
-                                                              var=self.__varSuppr)
+        self.__selectMenuSuppr = aOptionMenu(self.__frameSuppr,value=listEvent)
 
         self.__selectMenuSuppr.grid(row=1, column=1, sticky="", pady=10)
 
@@ -330,7 +304,7 @@ class GUIAgenda(GuiBase):
         return True
 
     def __supprEvent(self):
-        name = self.__varSuppr.get()
+        name = self.__selectMenuSuppr.getValue()
         if name == "" :
             showerror("Erreur",
                       "Aucun événement sélectionné")
@@ -346,7 +320,7 @@ class GUIAgenda(GuiBase):
 
     def activeAdd(self):
         self.active()
-        self.__viewAddEvent(0)
+        self.__viewAddEvent()
 
     def activeDel(self):
         self.active()

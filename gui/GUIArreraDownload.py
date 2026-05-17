@@ -1,8 +1,8 @@
-from librairy.arrera_tk import *
 from fnc.fonctionArreraDownload import *
 from tkinter.messagebox import showerror,showinfo
 import threading as th
 from gui.guibase import GuiBase,gestionnaire
+from librairy.arrera_tk import *
 
 
 class GUIArreraDownload(GuiBase):
@@ -21,39 +21,33 @@ class GUIArreraDownload(GuiBase):
         self.__varGetMode = StringVar(self._screen)
         # Frame
         # main
-        self.__fMain = self._arrtk.createFrame(self._screen, width=450, height=450)
+        self.__fMain = aFrame(self._screen, width=450, height=450)
         # Download
-        self.__fDownload = self._arrtk.createFrame(self._screen, width=450, height=450)
+        self.__fDownload = aFrame(self._screen, width=450, height=450)
         # Widget
         # fmain
-        labelTitle = self._arrtk.createLabel(self.__fMain, text="Arrera Download",
-                                             ppolice="Arial", ptaille=30,
-                                             pstyle="bold")
+        labelTitle = aLabel(self.__fMain, text="Arrera Download",font=("Roboto",30,"bold"))
 
-        self.__entryURL = self._arrtk.createEntry(self.__fMain, ppolice="Arial", ptaille=20, width=400)
-        btnDownload = self._arrtk.createButton(self.__fMain, text="Telecharger", command=self.__downlaodView,
-                                               ppolice="Arial", ptaille=20)
-        modeSelection = self._arrtk.createOptionMenu(self.__fMain,
-                                                     var=self.__varGetMode,
-                                                     value=self.__listMode,
-                                                     police="Arial", taille=20)
+        self.__entryURL = aEntry(self.__fMain,width=400)
+        btnDownload = aButton(self.__fMain, text="Telecharger", command=self.__downlaodView,size=20)
+        modeSelection = ctk.CTkOptionMenu(self.__fMain,variable=self.__varGetMode,values=self.__listMode,font=("Roboto",20,"bold"))
 
         # fDownload
-        self.__labelDownload = self._arrtk.createLabel(self.__fDownload, text="", ppolice="Arial", ptaille=20)
+        self.__labelDownload = aLabel(self.__fDownload, text="",font=("Roboto",25,"bold"))
         # fmain
-        self._arrtk.placeTopCenter(labelTitle)
+        labelTitle.placeTopCenter()
         modeSelection.place(x=10, y=60)
-        self._arrtk.placeBottomCenterNoStick(btnDownload)
-        self._arrtk.placeCenter(self.__entryURL)
+        btnDownload.placeBottomCenterNoStick()
+        self.__entryURL.placeCenter()
         # fDonwload
-        self._arrtk.placeCenter(self.__labelDownload)
+        self.__labelDownload.placeCenter()
         # Mise d'une valeur sur l'option menu
         self.__varGetMode.set(self.__listMode[0])
 
-        self._arrtk.placeCenter(self.__fMain)
+        self.__fMain.placeCenter()
 
     def __backMain(self):
-        self._arrtk.placeCenter(self.__fMain)
+        self.__fMain.placeCenter()
 
     def __downlaodView(self):
         url = self.__entryURL.get()
@@ -81,7 +75,7 @@ class GUIArreraDownload(GuiBase):
         self.__tDownload = th.Thread(target=self.__objetArrera.download)
 
         self.__fMain.place_forget()
-        self._arrtk.placeCenter(self.__fDownload)
+        self.__fDownload.placeCenter()
         self.__labelDownload.configure(text="Telechargement en cours...")
         self.__tDownload.start()
         self._screen.after(500, self.__downloadCheck)
@@ -106,9 +100,5 @@ class GUIArreraDownload(GuiBase):
             showinfo("Download", "Telechargement terminer")
             self.__fDownload.place_forget()
             self.__tDownload = th.Thread()
-            self._arrtk.placeCenter(self.__fMain)
+            self.__fMain.placeCenter()
             self._screen.update()
-
-    def __downloadNewVersion(self):
-        wb.open("https://github.com/Arrera-Software/Arrera-VideoDownload/releases")
-        self._screen.quit()

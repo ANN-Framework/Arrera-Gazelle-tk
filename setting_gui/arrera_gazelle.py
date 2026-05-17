@@ -1,6 +1,6 @@
 import webbrowser
 
-from lib.arrera_tk import *
+from librairy.arrera_tk import *
 from tkinter import messagebox
 from typing import Union
 import threading as th

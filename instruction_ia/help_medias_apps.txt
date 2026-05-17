@@ -1,0 +1,6 @@
+Capacités d'Arrera OPALE - Médias et Applications :
+- Applications : "ouvre [nom de l'app/site]", YouTube, YouTube Music, Arrera Download.
+- Calculatrice : "ouvre calculatrice" (existe en mode standard, mode complexe, mode pythagore).
+- Radio : Dire "lance la radio [nom de la station]" ou "arrete la radio". (Stations : Europe 1, Europe 2, France Info/Inter/Musique/Culture/Bleu, Fun Radio, NRJ, RFM, Nostalgie, Skyrock, RTL).
+- Services divers : "lis le texte" (presse-papier), "calcule [expression]", "corrige [texte]", "traducteur".
+- Interface : "lance le mode [1-6]" ou "ferme le mode".

@@ -17,8 +17,8 @@ class fncArreraSearch(fncBase) :
         if self.__etatConnexion:
             # Recherche avec l'interface Arrera
             if (self._gestionnaire.getGestNeuron().getSocket() and
-                    self._gestionnaire.getSocketObjet().getServeurOn()):
-                self._gestSocket.sendData("recherche "+query)
+                    self._gestionnaire.getSocketObjet().get_client_is_on()):
+                self._gestSocket.send_data_with_clien("recherche " + query)
                 return True
             else :
                 moteurUser = self._gestionnaire.getUserConf().getMoteurRecherche()

@@ -48,7 +48,10 @@
     "markdown: md",
     "Arrera Postite: .ab"
   ],
-  "phHelpArreraWork5": "Les fonction d'Arrera work sont :\n- Edition tableur (Taper aide tableur)\n- Edition fichier de traitement de texte (Taper aide word)\n- Fonction Arrera projet (Taper aide projet)",
+  "phHelpArreraWork5": ["Les fonction d'Arrera work sont :",
+    "Edition tableur (Taper aide tableur)",
+    "Edition fichier de traitement de texte (Taper aide word)",
+    "Fonction Arrera projet (Taper aide projet)"],
 
   "phArreraWork1": "Vous avez un fichier de traitement de texte ouvert ainsi qu'un tableur.",
   "phArreraWork2": "Vous avez juste ouvert un fichier tableur.",

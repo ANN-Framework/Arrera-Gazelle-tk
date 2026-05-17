@@ -29,6 +29,25 @@ class neuroneChatbot(neuronBase) :
         self._valeurOut = 0
         if not self._keyword.checkUtils(requette, "stop"):
             if self.__gestIA.get_ia_is_enable():
+                # Check pour load le bon fichier d'help
+                if self._keyword.checkUtils(requette, "question-fonction"):
+                    if self._keyword.checkUtils(requette,"q-agenda-taches"):
+                        self.__gestIA.load_help("agenda-tache")
+                    elif self._keyword.checkUtils(requette,"q-arrera-work"):
+                        self.__gestIA.load_help("work") # Work
+                    elif self._keyword.checkUtils(requette, "q-dev-recherche"):
+                        self.__gestIA.load_help("dev-recherche") # recherche dev
+                    elif self._keyword.checkUtils(requette,"q-gps"):
+                        self.__gestIA.load_help("gps") # GPS
+                    elif self._keyword.checkUtils(requette,"q-info-meteo"):
+                        self.__gestIA.load_help("infos-meteo") # Info meteo
+                    elif self._keyword.checkUtils(requette,"q-medias-apps"):
+                        self.__gestIA.load_help("medias-apps") # Media / App
+                    else :
+                        pass
+                else :
+                    pass
+
                 if self.__gestIA.send_request_ia(requette):
                     if self.__gestIA.get_state_ia_reponse():
                         out_ia = self.__gestIA.get_reponse_ia()

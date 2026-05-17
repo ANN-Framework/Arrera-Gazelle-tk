@@ -9,5 +9,7 @@
   "time": "time.json",
   "work": "work.json",
   "socket": "socket.json",
-  "interface": "interface.json"
+  "interface": "interface.json",
+  "connection": "connection.json",
+  "markdown": "markdown.json"
 }

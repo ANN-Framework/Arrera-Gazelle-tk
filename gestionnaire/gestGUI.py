@@ -128,7 +128,7 @@ class gestGUI:
             ),
             "work_manage_tableur": lambda: self.__guiManageTableur(self.__parms),
             "work_read_tableur": lambda: self.__generic_bool_action(
-                self.__guiWork.activeReadTableur,
+                self.__guiWork.active_read_tableur,
                 lambda: self.__gest.getLanguageObjet().getPhraseArreraWorkTableur("21"),
                 lambda: self.__gest.getLanguageObjet().getPhraseArreraWorkTableur("22")
             ),
@@ -138,27 +138,27 @@ class gestGUI:
                 lambda: self.__gest.getLanguageObjet().getPhraseOpenGUIWork("6")
             ),
             "work_word_read": lambda: self.__generic_try_action(
-                self.__guiWork.activeReadWord,
+                self.__guiWork.active_read_word,
                 lambda: self.__gest.getLanguageObjet().getPhraseArreraWorkWord("9"),
                 lambda: self.__gest.getLanguageObjet().getPhraseArreraWorkWord("10")
             ),
             "work_word_write": lambda: self.__generic_try_action(
-                self.__guiWork.activeWriteWord,
+                self.__guiWork.active_write_word,
                 lambda: self.__gest.getLanguageObjet().getPhraseArreraWorkWord("7"),
                 lambda: self.__gest.getLanguageObjet().getPhraseArreraWorkWord("8")
             ),
             "tache_projet": lambda: self.__generic_bool_action(
-                self.__guiWork.openTaskProjet,
+                self.__guiWork.open_task_projet,
                 lambda: self.__gest.getLanguageObjet().getPhraseArreraWorkProjet("10", self.__gest.getGestFNC().getFNCWork().getNameProjet()),
                 lambda: self.__gest.getLanguageObjet().getPhraseArreraWorkProjet("11")
             ),
             "tache_projet_add": lambda: self.__generic_bool_action(
-                self.__guiWork.openTaskProjetAdd,
+                self.__guiWork.open_task_projet_add,
                 lambda: self.__gest.getLanguageObjet().getPhraseArreraWorkProjet("12", self.__gest.getGestFNC().getFNCWork().getNameProjet()),
                 lambda: self.__gest.getLanguageObjet().getPhraseArreraWorkProjet("13")
             ),
             "tache_projet_del": lambda: self.__generic_bool_action(
-                self.__guiWork.openTaskProjetdel,
+                self.__guiWork.open_task_projet_del,
                 lambda: self.__gest.getLanguageObjet().getPhraseArreraWorkProjet("14", self.__gest.getGestFNC().getFNCWork().getNameProjet()),
                 lambda: self.__gest.getLanguageObjet().getPhraseArreraWorkProjet("15")
             ),
@@ -231,7 +231,7 @@ class gestGUI:
         liste = self.__parms[1]
         intIn = self.__parms[2]
         self.__guiResumer.activeView(dict=dicte, list=liste, intIn=intIn)
-        self.__textOut = self.__gest.getLanguageObjet().getPhraseOpenTraducteur()
+        self.__textOut = self.__parms[3]
         self.__valOut = 5
         return True
 
@@ -243,7 +243,7 @@ class gestGUI:
 
     def __guiManageTableur(self, param: int):
         try:
-            out = self.__guiWork.activeManageTableur(int(param))
+            out = self.__guiWork.active_manage_tableur()
         except Exception:
             self.__textOut = self.__gest.getLanguageObjet().getPhraseArreraWorkTableur("8")
             self.__valOut = 1

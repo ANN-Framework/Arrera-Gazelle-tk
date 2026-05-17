@@ -1,4 +1,10 @@
 {
   "stop": ["stop","au revoir","quitter","bonne nuit","adieu","bonne soirée","arreter","arrete","stoppe"],
-  "question-fonction": ["comment ça fonctionne","a quoi sert","que fait cette","comment marche","comment fonctionne"]
+  "question-fonction": ["comment ça fonctionne","a quoi sert","que fait cette","comment marche","comment fonctionne"],
+  "q-agenda-taches": ["agenda", "tache", "taches", "calendrier", "planning", "emploi du temps", "rendez-vous"],
+  "q-arrera-work": ["arrera work", "work", "espace de travail", "projet", "projets"],
+  "q-dev-recherche": ["dev", "developpement", "recherche", "rechercher", "internet", "navigateur", "code", "programmation"],
+  "q-gps": ["gps", "itineraire", "localisation", "trajet", "route", "direction"],
+  "q-info-meteo": ["info", "informations", "meteo", "temps", "actualit", "actualits", "mto"],
+  "q-medias-apps": ["media", "medias", "application", "applications", "apps", "app", "radio", "musique", "logiciel", "logiciels", "youtube"]
 }

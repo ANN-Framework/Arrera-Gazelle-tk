@@ -10,7 +10,7 @@ class GUIViewResumer(GUIView):
         18 : Resumer tache / agenda
         19 : Resumer all ok
         """
-        self._textBox.configure(state="normal")
+        self._textBox.enableTextBox()
         match intIn:
             case 12:
                 if dict is not None:
@@ -23,10 +23,10 @@ class GUIViewResumer(GUIView):
                     for i in actu:
                         texteActu += f"- {i}\n"
 
-                    self._textBox.delete(1.0, "end")
-                    self._textBox.insert("end", f"{texteActu}\n")
-                    self._textBox.insert("end", texteMeteo)
-                    self._textBox.configure(state="disabled", font=("Arial", 20, "normal"))
+                    self._textBox.getTextBox().delete(1.0, "end")
+                    self._textBox.getTextBox().insert("end", f"{texteActu}\n")
+                    self._textBox.getTextBox().insert("end", texteMeteo)
+                    self._textBox.disableTextBox()
                     self._textRead = f"{texteActu} {texteMeteo}"
                     return True
                 else:
@@ -41,9 +41,9 @@ class GUIViewResumer(GUIView):
                         for i in task:
                             texteTask += f"- {i}\n"
 
-                    self._textBox.delete(1.0, "end")
-                    self._textBox.insert("end", texteTask)
-                    self._textBox.configure(state="disabled", font=("Arial", 20, "normal"))
+                    self._textBox.getTextBox().delete(1.0, "end")
+                    self._textBox.getTextBox().insert("end", texteTask)
+                    self._textBox.disableTextBox()
                     self._textRead = texteTask
                     return True
                 else:
@@ -65,16 +65,16 @@ class GUIViewResumer(GUIView):
                         for i in task:
                             texteTask += f"- {i}\n"
 
-                    self._textBox.delete(1.0, "end")
-                    self._textBox.insert("end", texteActu + "\n" + texteMeteo + "\n" + texteTask)
-                    self._textBox.configure(state="disabled", font=("Arial", 20, "normal"))
+                    self._textBox.getTextBox().delete(1.0, "end")
+                    self._textBox.getTextBox().insert("end", texteActu + "\n" + texteMeteo + "\n" + texteTask)
+                    self._textBox.disableTextBox()
                     self._textRead = f"{texteActu} {texteMeteo} {texteTask}"
                     return True
                 else :
-                    self._textBox.configure(state="disabled", font=("Arial", 20, "normal"))
+                    self._textBox.disableTextBox()
                     return False
             case _:
-                self._textBox.configure(state="disabled", font=("Arial", 20, "normal"))
+                self._textBox.disableTextBox()
                 return False
 
     def activeView(self,dict:dict=None,list:list=None, intIn:int=0):

@@ -24,11 +24,14 @@ class ABrain :
         #recuperation etat du reseau
         self.__etatReseau = self.__gestionnaire.getNetworkObjet().getEtatInternet()
         # Theard recevied message socket
-        if self.__gestSocket is not None and self.__gestSocket.getServeurOn():
-            # print("Theard socket started")
-            self.__threadSocket = th.Thread(target=self.__gestSocket.receivedMessageServer)
+        if self.__gestSocket is not None and self.__gestSocket.get_client_is_on():
+            self.__threadSocket = th.Thread(target=self.__gestSocket.received_message_client)
             self.__threadSocket.daemon = True
             self.__threadSocket.start()
+
+
+    def getGestionnaire(self):
+        return self.__gestionnaire
 
     def getNeuronRunning(self):
         return self.__networkRunning
@@ -40,8 +43,12 @@ class ABrain :
         hour = datetime.now().hour
         text = self.__gestLangue.aurevoir(hour)
         if self.__gestionnaire.getGestNeuron().getSocket():
-            if self.__gestSocket.getServeurOn():
-                self.__gestSocket.stopSocket()
+            if self.__gestSocket.get_client_is_on():
+                self.__gestSocket.stop_socket_client()
+
+            if self.__gestSocket.get_server_is_on():
+                self.__gestSocket.broadcast_data_with_server("closed")
+                self.__gestSocket.stop_socket_server()
         self.__gestionnaire.getGestHist().saveHist()
         return str(text)
     
@@ -229,18 +236,36 @@ class ABrain :
             self.__valeurOut = 5
             return True
         elif self.__gestSocket is not None:
-            if self.__gestSocket.getMessageIsReceived():
+            if self.__gestSocket.get_new_client_is_connected():
+                self.__listOut = [self.__gestionnaire.getLanguageObjet().getPhraseSoftConnected(self.__gestSocket.get_name_new_client()),""]
+                self.__valeurOut = 1
+                return True
+            elif self.__gestSocket.get_message_is_received_from_server():
+                out = self.__gestSocket.get_message_from_server()
+                client = out["client"]
+                message = out["message"]
+                if message != "Message Received" :
+                    if client == "arrera_markdown":
+                        self.__gestNeuron.nmarkdown.neurone(message)
+                        self.__listOut = self.__gestNeuron.nmarkdown.getListSortie()
+                        self.__valeurOut = self.__gestNeuron.nmarkdown.getValeurSortie()
+                        return True
+                    else :
+                        return False
+                else :
+                    return False
+            elif self.__gestSocket.get_message_is_received_form_client():
                 if self.__gestionnaire.getKeywordObjet().checkInterface(
-                        self.__gestSocket.getMessageServer(),"requette"):
+                        self.__gestSocket.get_message_form_client(), "requette"):
                     mots = self.__gestionnaire.getKeywordObjet().getListKeyword("interface","requette")
-                    message = self.__gestSocket.getMessageServer().replace(mots[0],"").strip()
+                    message = self.__gestSocket.get_message_form_client().replace(mots[0], "").strip()
                     self.neuron(message)
                     return True
-                elif self.__gestionnaire.getKeywordObjet().checkInterface(self.__gestSocket.getMessageServer(),"namemode"):
-                    self.__gestionnaire.setNameMode(self.__gestSocket.getMessageServer())
+                elif self.__gestionnaire.getKeywordObjet().checkInterface(self.__gestSocket.get_message_form_client(), "namemode"):
+                    self.__gestionnaire.setNameMode(self.__gestSocket.get_message_form_client())
                     return False
                 else:
-                    message = self.__gestSocket.getMessageServer()
+                    message = self.__gestSocket.get_message_form_client()
                     self.__gestNeuron.ninterface.neurone(message)
                     self.__listOut = self.__gestNeuron.ninterface.getListSortie()
                     self.__valeurOut = self.__gestNeuron.ninterface.getValeurSortie()

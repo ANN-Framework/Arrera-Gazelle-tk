@@ -6,9 +6,9 @@ class GUIHelp(GUIView):
 
     def activeHelp(self, texte:str):
         self.active()
-        self._textBox.configure(state="normal")
-        self._textBox.delete(1.0, "end")
-        self._textBox.insert("end", texte)
-        self._textBox.configure(state="disabled", font=("Arial", 20, "normal"))
+        self._textBox.enableTextBox()
+        self._textBox.getTextBox().delete(1.0, "end")
+        self._textBox.getTextBox().insert("end", texte)
+        self._textBox.disableTextBox()
         self._titleLabel.configure(text="Aide")
         self._textRead = texte

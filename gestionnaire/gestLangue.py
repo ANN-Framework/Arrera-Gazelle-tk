@@ -20,6 +20,8 @@ class gestLangue:
         self.__work = jsonWork(ressource_lib.resource_path(emplacement + index.getContentJsonFlag("work")))
         self.__socket = jsonWork(ressource_lib.resource_path(emplacement + index.getContentJsonFlag("socket")))
         self.__interface = jsonWork(ressource_lib.resource_path(emplacement + index.getContentJsonFlag("interface")))
+        self.__connection = jsonWork(ressource_lib.resource_path(emplacement + index.getContentJsonFlag("connection")))
+        self.__markdown = jsonWork(ressource_lib.resource_path(emplacement + index.getContentJsonFlag("markdown")))
         self.__fncHist = gestion.getGestHist()
         # Variable
         self.__listFonction = listFonc
@@ -407,5 +409,19 @@ class gestLangue:
     def getPhraseCloseMode(self):
         nb = str(random.randint(1,2))
         formule = self.__interface.getContentJsonFlag("phCloseMode"+nb)
+        return formule.format(genre=self.__genre, user_firstname=self.__userFirstname,
+                              user_lastname=self.__userLastname)
+
+    # Connection
+
+    def getPhraseSoftConnected(self,soft:str):
+        formule = self.__connection.getContentJsonFlag(soft)
+        return formule.format(genre=self.__genre, user_firstname=self.__userFirstname,
+                              user_lastname=self.__userLastname)
+
+    # Markdown
+
+    def getPhraseMarkdownt(self,nb:str):
+        formule = self.__markdown.getContentJsonFlag("ph"+nb)
         return formule.format(genre=self.__genre, user_firstname=self.__userFirstname,
                               user_lastname=self.__userLastname)

@@ -1,0 +1,5 @@
+Capacités d'Arrera OPALE - Gestion du temps et Tâches :
+- Temps : Demander "l'heure", "la date", ou lancer un "chronometre", "horloge", "minuteur".
+- Agenda : "ouvre l'agenda", "ajoute a l'agenda", "supprime de l'agenda".
+- To-Do List : "ouvre les taches", "combien de tache aujourd'hui/demain".
+- Ajouter/Terminer une tâche : 1. Dire "ajoute une tache" ou "tache finie" -> 2. Dire "le nom est [nom]".

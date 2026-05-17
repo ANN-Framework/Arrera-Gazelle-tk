@@ -1,4 +1,5 @@
 from gui.guibase import GuiBase,gestionnaire
+from librairy.arrera_tk import *
 
 class GUILecture(GuiBase):
     def __init__(self,gestionnaire:gestionnaire):
@@ -9,8 +10,8 @@ class GUILecture(GuiBase):
         self._screen.grid_rowconfigure(0, weight=1)
         self._screen.grid_columnconfigure(0, weight=1)
         # frame
-        self.__frameSetText = self._arrtk.createFrame(self._screen)
-        self.__frameReadText = self._arrtk.createFrame(self._screen)
+        self.__frameSetText = aFrame(self._screen)
+        self.__frameReadText = aFrame(self._screen)
 
         # Configuration
         self.__frameSetText.grid_columnconfigure(0, weight=1)
@@ -22,18 +23,13 @@ class GUILecture(GuiBase):
         self.__frameReadText.grid_columnconfigure(0, weight=1)
 
         # Widgets
-        labelTitle = self._arrtk.createLabel(self.__frameSetText, text="Lecture de texte",
-                                             ppolice="Arial", ptaille=35, pstyle="bold")
-        self.__textToRead = self._arrtk.createText(self.__frameSetText, ppolice="Arial",
-                                                   ptaille=25, pstyle="normal",)
-        buttonRead = self._arrtk.createButton(self.__frameSetText, text="Lire le texte",
-                                              ppolice="Arial", ptaille=25, pstyle="bold",
-                                              bg=self._btnColor,fg=self._btnTexteColor,
-                                              command=self.__readText)
+        labelTitle = aLabel(self.__frameSetText, text="Lecture de texte",police_size=30)
+        self.__textToRead = aTextScrollable(self.__frameSetText,police_size=20)
+        buttonRead = aButton(self.__frameSetText, text="Lire le texte",size=20,command=self.__readText)
 
-        labelViewRead = self._arrtk.createLabel(self.__frameReadText, text="Lecture en cours...",
-                                               ppolice="Arial", ptaille=35, pstyle="bold")
+        labelViewRead = aLabel(self.__frameReadText, text="Lecture en cours...",police_size=25)
 
+        self.__textToRead.enableTextBox()
         # Placement
         labelTitle.grid(row=0, column=0, padx=12, pady=(12, 8))
         self.__textToRead.grid(row=1, column=0, sticky="nsew", padx=12, pady=8)
@@ -44,8 +40,8 @@ class GUILecture(GuiBase):
         self.__frameSetText.grid(row=0, column=0, sticky="nsew")
 
     def __readText(self):
-        texte = self.__textToRead.get("1.0", "end-1c")
-        self.__textToRead.delete("1.0", "end")
+        texte = self.__textToRead.getTextBox().get("1.0", "end-1c")
+        self.__textToRead.getTextBox().delete("1.0", "end")
         if texte != "":
             self.__fncLecture.read(texte)
             self.__frameSetText.grid_forget()

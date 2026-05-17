@@ -6,33 +6,45 @@ import json
 class model_downloader:
     def __init__(self):
 
-        self.__dictModel = {"leger-gemma":{"name":"Gemma 2B Q5_K_M",
-                                           "url":"https://huggingface.co/ironlanderl/gemma-2-2b-it-Q5_K_M-GGUF/resolve/main/gemma-2-2b-it-q5_k_m.gguf?download=true",
-                                           "description":"Petit modèle Google Gemma, parfait pour tourner sur un PC sans carte graphique ou NPU."},
-                            "leger-llama":{"name":"LLaMA 3.2 1B Q4_K_M",
-                                           "url":"https://huggingface.co/hugging-quants/Llama-3.2-1B-Instruct-Q4_K_M-GGUF/resolve/main/llama-3.2-1b-instruct-q4_k_m.gguf?download=true",
-                                           "description":"Petit modèle Meta(Facebook) LLaMA, parfait pour tourner sur un PC sans carte graphique ou NPU."},
-                            "leger-mistral":{"name":"Mistral‑Nemo 4B Q4_K_M",
-                                             "url":"https://huggingface.co/Nehal07/Mistral-Nemo-Instruct-2407-Q4_K_M-GGUF/resolve/main/mistral-nemo-instruct-2407-q4_k_m.gguf?download=true",
-                                             "description":"Petit modèle de Mistral(Boite française), parfait pour tourner sur un PC sans carte graphique ou NPU."},
-                            "moyen-gemma":{"name":"Gemma 2 9B Q4_K_M",
-                                           "url":"https://huggingface.co/quixotedav/gemma-2-9b-it-Q4_K_M-GGUF/resolve/main/gemma-2-9b-it-q4_k_m.gguf?download=true",
-                                           "description":"Modèle Google Gemma de taille moyenne, parfait pour tourner sur un PC avec une carte graphique ou équipé de NPU."},
-                            "moyen-llama":{"name":"LLaMA 3.1 8B Q4_K_M",
-                                           "url":"https://huggingface.co/YorkieOH10/Meta-Llama-3.1-8B-Instruct-hf-Q4_K_M-GGUF/resolve/main/meta-llama-3.1-8b-instruct-hf-q4_k_m.gguf?download=true",
-                                           "description":"Modèle Meta(Facebook) LLaMA de taille moyenne, parfait pour tourner sur un PC avec une carte graphique ou équipé de NPU."},
-                            "moyen-mistral":{"name":"Mistral‑7B Instruct v0.3 Q4_K_M",
-                                             "url":"https://huggingface.co/jfer1015/Mistral-7B-Instruct-v0.3-Q4_K_M-GGUF/resolve/main/mistral-7b-instruct-v0.3-q4_k_m.gguf?download=true",
-                                             "description":"Modèle de Mistral(Boite française) de taille moyenne, parfait pour tourner sur un PC avec une carte graphique ou équipé de NPU."},
-                            "lourd-gemma":{"name":"Gemma 3 27B en FP16",
-                                           "url":"https://huggingface.co/ALHAJERI/gemma_3_27b_endo_finetuned_fp16-gguf/resolve/main/gemma_3_27b_endo_finetuned_merged_fp16.gguf?download=true",
-                                           "description":"Modèle Google Gemma 3, lourd pour les PC avec une carte graphique de 12 Go de NVRAM ou plus."},
-                            "lourd-llama":{"name":"LLaMA 3.1 34B FP16",
-                                           "url":"https://huggingface.co/TheBloke/CodeLlama-34B-Instruct-GGUF/resolve/main/codellama-34b-instruct.Q4_0.gguf?download=true",
-                                           "description":"Modèle Meta(Facebook) LLaMA 3.1, lourd pour les PC avec une carte graphique de 12 Go de NVRAM ou plus."},
-                            "lourd-mistral":{"name":"Mixtral 8x22B Q4_K_M",
-                                             "url":"https://huggingface.co/bartowski/Mixtral-8x22B-v0.1-GGUF/resolve/main/Mixtral-8x22B-v0.1-IQ3_M-00001-of-00005.gguf?download=true",
-                                             "description":"Modèle de Mistral(Boite française), lourd pour les PC avec une carte graphique de 12 Go de NVRAM ou plus."}}
+        self.__dictModel = {"leger-gemma": {
+                                "name": "Gemma 4 E2B Q4_K_M",
+                                "url": "https://huggingface.co/bartowski/google_gemma-4-E2B-it-GGUF/resolve/main/google_gemma-4-E2B-it-Q4_K_M.gguf?download=true",
+                                "description": "Le tout dernier petit modèle 'Edge' Google Gemma 4. Ultra-rapide et parfait pour tourner de manière fluide sur le processeur (CPU) d'un PC sans carte graphique."},
+                            "moyen-gemma": {
+                                "name": "Gemma 3 12B Q4_K_M",
+                                "url": "https://huggingface.co/unsloth/gemma-3-12b-it-GGUF/resolve/main/gemma-3-12b-it-Q4_K_M.gguf?download=true",
+                                "description": "Modèle Google Gemma 3 très équilibré. Idéal pour exploiter un PC équipé d'une carte graphique classique (entre 8 et 12 Go de VRAM)."},
+                            "lourd-gemma": {
+                                "name": "Gemma 4 31B Q4_K_M",
+                                "url": "https://huggingface.co/bartowski/google_gemma-4-31B-it-GGUF/resolve/main/google_gemma-4-31B-it-Q4_K_M.gguf?download=true",
+                                "description": "Le nouveau fleuron de Google (Gemma 4). Très lourd et puissant, il nécessite une grosse carte graphique (16 à 24 Go de VRAM minimum) ou beaucoup de RAM vive."},
+                            "leger-mistral": {
+                                "name": "Ministral 3B Instruct Q4_K_M",
+                                "url": "https://huggingface.co/mistralai/Ministral-3-3B-Instruct-2512-GGUF/resolve/main/Ministral-3-3B-Instruct-2512-Q4_K_M.gguf?download=true",
+                                "description": "Petit modèle de la startup française Mistral. Très vif, parfait pour tourner de manière fluide sur un PC sans carte graphique dédiée (sur le CPU)."
+                            },
+                            "moyen-mistral": {
+                                "name": "Mistral Nemo 12B Instruct Q4_K_M",
+                                "url": "https://huggingface.co/bartowski/Mistral-Nemo-Instruct-2407-GGUF/resolve/main/Mistral-Nemo-Instruct-2407-Q4_K_M.gguf?download=true",
+                                "description": "Excellent modèle de 12 Milliards de paramètres. Le compromis idéal pour un PC équipé d'une carte graphique de milieu de gamme (8 à 12 Go de VRAM)."
+                            },
+                            "lourd-mistral": {
+                                "name": "Mistral Small 3 (24B) Instruct Q4_K_M",
+                                "url": "https://huggingface.co/bartowski/Mistral-Small-24B-Instruct-2501-GGUF/resolve/main/Mistral-Small-24B-Instruct-2501-Q4_K_M.gguf?download=true",
+                                "description": "Modèle avancé et très performant. Lourd, il nécessite une bonne carte graphique (au moins 16 Go de VRAM) ou beaucoup de RAM vive pour tourner confortablement."
+                            },
+                            "leger-llama": {
+                                "name": "LLaMA 3.2 3B Instruct Q4_K_M",
+                                "url": "https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf?download=true",
+                                "description": "Petit modèle Meta très intelligent. Parfait pour tourner sur le processeur (CPU) d'un PC sans carte graphique, avec une excellente rapidité."},
+                            "moyen-llama": {
+                                "name": "LLaMA 3.1 8B Instruct Q4_K_M",
+                                "url": "https://huggingface.co/bartowski/Meta-Llama-3.1-8B-Instruct-GGUF/resolve/main/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf?download=true",
+                                "description": "Le classique incontournable de Meta. Taille moyenne, tourne parfaitement sur un PC avec une carte graphique standard (8 Go de VRAM)."},
+                            "lourd-llama": {
+                                "name": "LLaMA 3.3 70B Instruct Q3_K_M",
+                                "url": "https://huggingface.co/bartowski/Llama-3.3-70B-Instruct-GGUF/resolve/main/Llama-3.3-70B-Instruct-Q3_K_M.gguf?download=true",
+                                "description": "Un modèle massif aux performances comparables à GPT-4. Attention : très lourd ! Nécessite au moins 32 Go de mémoire (VRAM + RAM combinées) pour fonctionner."}}
 
         os_name = platform.system()
 
@@ -50,6 +62,18 @@ class model_downloader:
 
     def get_model_list(self):
         return list(self.__dictModel.keys())
+
+    def get_model_on_dir(self):
+        list_model = []
+        for dossier_racine, sous_dossiers, fichiers in os.walk(self.__modelDir):
+            for fichier in fichiers:
+                if fichier.endswith(".gguf"):
+                    list_model.append(fichier)
+
+        if len(list_model) == 0:
+            return None
+        else :
+            return list_model
 
     def get_data_model(self,key:str):
         data = self.__dictModel[key]
@@ -88,6 +112,23 @@ class model_downloader:
                 return False
         except Exception as e :
             return False
+
+    def del_model(self,model:str):
+        if model in self.get_model_download():
+           file = self.get_path_model(model)
+           if os.path.isfile(file):
+               os.remove(file)
+               openfile = open(self.__modelDownloadFile, 'r' , encoding='utf-8')
+               dict = json.load(openfile)
+               openfile.close()
+               writeFile = open(self.__modelDownloadFile, 'w', encoding='utf-8')
+               dict["models"].remove(model)
+               json.dump(dict,writeFile,indent=2)
+               writeFile.close()
+               return True
+           else :
+               return False
+
 
     def get_path_model(self,key:str):
         if key in self.get_model_download():

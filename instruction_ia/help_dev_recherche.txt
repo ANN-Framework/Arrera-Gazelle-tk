@@ -1,0 +1,4 @@
+Capacités d'Arrera OPALE - Recherche et Outils Dev :
+- Recherche Internet : "recherche [sujet]" (simple) ou "bigsearch [sujet]" (grande recherche).
+- Documentation : "cherche [sujet] sur devdoc", "sur learn microsoft", "sur python", "sur github".
+- Outils Dev : Lancer "l'organisateur de variable", "le selecteur de couleur", "le gestionnaire github", "la librairie de projets".

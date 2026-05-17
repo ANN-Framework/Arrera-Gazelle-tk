@@ -86,8 +86,8 @@ class fncBreef(fncBase):
             if listProjet is not None:
                 for projet in listProjet:
                     if workfnc.openProjet(projet):
-                        if workfnc.setListTacheTodayProjet():
-                            tacheProjet[projet] = workfnc.getListTacheTodayProjet()
+                        if workfnc.setListTacheNoFinishProjet():
+                            tacheProjet[projet] = workfnc.getListTacheNoFinishProjet()
                         workfnc.closeProjet()
 
             return {"task": taskToday, "meteo": meteo, "tacheProjet": tacheProjet}

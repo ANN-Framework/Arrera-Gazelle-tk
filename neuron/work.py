@@ -13,8 +13,8 @@ class neuroneWork(neuronBase):
     def neurone(self,requette:str):
         #Initilisation des variable nbRand et text et valeur
         self._listSortie = ["",""]
-        self._valeurOut = self.__neuronTableur(requette)
         self._valeurOut = 0
+        self._valeurOut = self.__neuronTableur(requette)
         if not self._keyword.checkUtils(requette,"question-fonction"):
             if self._valeurOut == 0:
                 self._valeurOut = self.__neuronProjet(requette)
@@ -28,7 +28,7 @@ class neuroneWork(neuronBase):
 
     def __neuronHelp(self,requette:str):
         if self._keyword.checkWork(requette,"help-work"):
-            self._listSortie = [self._language.getPhraseHelpArreraWork("5"),"work"]
+            self._listSortie = [self._language.getPhraseHelpArreraWork("5"),""]
             return 17
         elif self._keyword.checkWork(requette,"question-open") and self._keyword.checkOpen(requette,"open") and self._keyword.checkWork(requette,"open-file"):
             word = self.__fonctionWork.getEtatWord()
@@ -47,11 +47,8 @@ class neuroneWork(neuronBase):
         else :
             return 0
 
-
-
-
     def __neuronTableur(self,requette:str):
-        if not self.__fonctionWork.getEtatTableur():
+        if not self.__fonctionWork.getEtatTableur() :
             if (self._keyword.checkOpen(requette,"open") and
                     self._keyword.checkWork(requette,"tableur-file") and
                     not self._keyword.checkWork(requette,"gui-work")):
@@ -69,16 +66,20 @@ class neuroneWork(neuronBase):
             else :
                 return 0
         else:
-            if (self._keyword.checkOpen(requette,"open") and
-                        self._keyword.checkWork(requette,"tableur-file") and
-                        self._keyword.checkOpen(requette,"computer")):
+            if self._keyword.checkWork(requette,"help-tableur"):
+                self._listSortie = [self._language.getPhraseHelpArreraWork("1")
+                    ,"tableur"]
+                return 17
+            elif (self._keyword.checkOpen(requette,"open") and
+                  self._keyword.checkWork(requette,"tableur-file") and
+                  self._keyword.checkOpen(requette,"computer")):
 
-                    if self.__fonctionWork.openTableurOs():
-                        self._listSortie = [self._language.getPhraseArreraWorkTableur("3"), ""]
-                    else :
-                        self._listSortie = [self._language.getPhraseArreraWorkTableur("4"), ""]
+                if self.__fonctionWork.openTableurOs():
+                    self._listSortie = [self._language.getPhraseArreraWorkTableur("3"), ""]
+                else :
+                    self._listSortie = [self._language.getPhraseArreraWorkTableur("4"), ""]
 
-                    return 1
+                return 1
             elif (self._keyword.checkWork(requette,"close") and
                   self._keyword.checkWork(requette,"tableur-file")):
 
@@ -121,8 +122,8 @@ class neuroneWork(neuronBase):
     def __neuronProjet(self,requette:str):
         if not self.__fonctionWork.getEtatProject():
             if (self._keyword.checkWork(requette,"open-project")and
-                not self._keyword.checkWork(requette,"gui-work")):
-                listKeyword = self._keyword.getListKeyword("work","open-project")
+                    not self._keyword.checkWork(requette,"gui-work")):
+                listKeyword = self._keyword.getListKeyword("work","list-word-open-project")
                 for mot in listKeyword:
                     requette = requette.replace(mot,"")
                 project = requette.strip()
@@ -186,8 +187,12 @@ class neuroneWork(neuronBase):
                                     "project"]
                 return 17
         else :
-            if (self._keyword.checkWork(requette,"project-file") and
-                    self._keyword.checkWork(requette,"close")):
+            if self._keyword.checkWork(requette,"help-project"):
+                self._listSortie = [self._language.getPhraseHelpArreraWork("3"),
+                                    "project"]
+                return 17
+            elif (self._keyword.checkWork(requette,"project-file") and
+                  self._keyword.checkWork(requette,"close")):
                 project = self.__fonctionWork.getNameProjet()
                 if self.__fonctionWork.closeProjet():
                     self._listSortie = [self._language.getPhraseArreraWorkProjet("8"),""]
@@ -247,11 +252,11 @@ class neuroneWork(neuronBase):
                                 ,""]
                             return 1
                         elif self.__fonctionWork.createFileProject(self.__nameFileProjectCreate,
-                                                                     self.__typeFileProjectCreate):
+                                                                   self.__typeFileProjectCreate):
                             nameTypeFile = self.__nameFileProjectCreate+"."+self.__typeFileProjectCreate
                             self._listSortie = [
                                 self._language.getPhraseArreraWorkProjet("18",
-                                                                       nameTypeFile),""]
+                                                                         nameTypeFile),""]
                             self.__fileProjectCreate = False
                             self.__nameFileProjectCreate = ""
                             self.__typeFileProjectCreate = ""
@@ -273,7 +278,7 @@ class neuroneWork(neuronBase):
                     self.__typeFileProjectCreate = requette.strip().replace(" ","")
 
                     if (self.__typeFileProjectCreate in self.__fonctionWork.getListTypeFileName()
-                        or self.__typeFileProjectCreate in self.__fonctionWork.getListTypeFileExtension() or
+                            or self.__typeFileProjectCreate in self.__fonctionWork.getListTypeFileExtension() or
                             self.__typeFileProjectCreate != ""):
 
                         if self.__nameFileProjectCreate == "":
@@ -286,7 +291,7 @@ class neuroneWork(neuronBase):
                             nameTypeFile = self.__nameFileProjectCreate+"."+self.__typeFileProjectCreate
                             self._listSortie = [
                                 self._language.getPhraseArreraWorkProjet("18",
-                                                                       nameTypeFile),""]
+                                                                         nameTypeFile),""]
                             self.__fileProjectCreate = False
                             self.__nameFileProjectCreate = ""
                             self.__typeFileProjectCreate = ""
@@ -320,9 +325,12 @@ class neuroneWork(neuronBase):
             else :
                 return 0
         else :
-            if (self._keyword.checkOpen(requette,"open") and
-                    self._keyword.checkWork(requette,"word-file") and
-                    self._keyword.checkOpen(requette,"computer")):
+            if self._keyword.checkWork(requette,"help-word"):
+                self._listSortie = [self._language.getPhraseHelpArreraWork("2"),"word"]
+                return 17
+            elif (self._keyword.checkOpen(requette,"open") and
+                  self._keyword.checkWork(requette,"word-file") and
+                  self._keyword.checkOpen(requette,"computer")):
 
                 if self.__fonctionWork.openWordOs():
                     self._listSortie = [self._language.getPhraseArreraWorkWord("3"), ""]

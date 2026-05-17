@@ -1,65 +1,54 @@
 from fnc.fncBase import fncBase,gestionnaire
-from spellchecker import SpellChecker
 import pyperclip
 
 class fncOrthographe(fncBase):
-    def __init__(self,gestionnaire:gestionnaire,language='fr'):
+    def __init__(self,gestionnaire:gestionnaire):
         super().__init__(gestionnaire)
-        self.__toolLaunched = False
-        try :
-            self.__tool = SpellChecker(language=language)
-            self.__toolLaunched = True
-        except Exception as e:
-            self.__toolLaunched = False
-        self.__correctedText = None
-        self.__mots = None
-        self.__matches = None
-    
-    def check(self, texte:str):
-        if not texte:
-            return False
-        if not self.__toolLaunched:
-            return False
+        self.__tool_launched = False
+        self.__gest_ia = None
+        if gestionnaire.getUserConf().get_use_ia():
+            self.__tool_launched = True
+            self.__gest_ia = gestionnaire.getGestIA()
 
-        try :
-            self.__mots = texte.split()
-            self.__matches = self.__tool.unknown(self.__mots)
-            return True
-        except Exception as e:
-            return False
+        self.__text_no_corrected = None
+        self.__text_corrected = None
 
-    def getMotsIncorrects(self):
-        if self.__matches is None:
-            return None
-        if not self.__toolLaunched:
-            return None
-        return list(self.__matches)
-    
-    def correctionText(self):
-        if self.__matches is None:
-            return False
-        if not self.__toolLaunched:
-            return False
+    def corrected_text(self,texte:str):
+        if self.__tool_launched:
+            if texte == "":
+                return False
 
-        try:
-            self.__correctedText = ' '.join([self.__tool.correction(mot) if mot in self.__matches else mot for mot in self.__mots])
-            return True
-        except Exception as e:
+            if self.__gest_ia.load_help("orthographe"):
+                self.__text_no_corrected = texte
+
+                if self.__gest_ia.correted_text(self.__text_no_corrected):
+                    self.__text_corrected = self.__gest_ia.get_reponse_ia()
+                    return True
+                else :
+                    return False
+
+            else:
+                return False
+
+        else :
             return False
 
     def getCorrections(self):
-        return self.__correctedText
+        return self.__text_corrected
+
+    def get_text_no_corrected(self):
+        return self.__text_no_corrected
 
     def copyCorrections(self):
-        if not self.__toolLaunched:
+        if not self.__tool_launched:
             return False
-        if self.__correctedText is None:
+        if self.__text_corrected is None:
             return False
         try :
-            pyperclip.copy(self.__correctedText)
+            pyperclip.copy(self.__text_corrected)
             return True
         except Exception as e:
             return False
 
     def getToolLaunched(self):
-        return self.__toolLaunched
+        return self.__tool_launched

@@ -10,8 +10,6 @@ class GuiBase:
         self.__icon = self._gestionnaire.getIcon()
         self._btnColor = self._gestionnaire.getConfigFile().assistant_color
         self._btnTexteColor = self._gestionnaire.getConfigFile().assistant_texte_color
-        # Arrera TK
-        self._arrtk = CArreraTK()
         # Init de la var de la fenetre
         self._screen = None
 
@@ -20,11 +18,10 @@ class GuiBase:
         pass
 
     def active(self):
-        self._screen = self._arrtk.aTopLevel(
+        self._screen = aTopLevel(
             title=self._titleGUI,
             width=800,
             height=600,
             resizable=True,
-            icon=self.__icon,
-        )
+            icon=self.__icon)
         self._mainframe()

@@ -7,7 +7,7 @@ class fonctionOpen(fncBase):
         super().__init__(gestionnaire)
         self.__softopen = OpenSoftware()
         self.__socket = self._gestionnaire.getSocketObjet()
-        if self.__socket is not None and self.__socket.getServeurOn():
+        if self.__socket is not None and self.__socket.get_client_is_on():
             self.__socketEnabled = True
         else:
             self.__socketEnabled = False
@@ -53,7 +53,7 @@ class fonctionOpen(fncBase):
         if name == "":
             return False
 
-        return self.__socket.sendData("ouvre "+name)
+        return self.__socket.send_data_with_clien("ouvre " + name)
 
     def openSaveWebSiteAssistant(self, name) -> bool:
         if name == "":
@@ -80,7 +80,7 @@ class fonctionOpen(fncBase):
         if not self.__socketEnabled:
             return False
 
-        return self.__socket.sendData("website "+url)
+        return self.__socket.send_data_with_clien("website " + url)
 
     def openSaveWebSite(self, name) -> int:
         """
@@ -113,7 +113,7 @@ class fonctionOpen(fncBase):
             else:
                 return 0
         else:
-            if self.__socket.sendData("website "+url):
+            if self.__socket.send_data_with_clien("website " + url):
                 return 2
             else:
                 return 0

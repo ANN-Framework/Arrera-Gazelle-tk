@@ -1,5 +1,5 @@
 from tkinter import StringVar
-
+from librairy.arrera_tk import *
 from gui.guibase import GuiBase,gestionnaire
 
 class GuiTraducteur(GuiBase):
@@ -14,8 +14,8 @@ class GuiTraducteur(GuiBase):
         self.__varLangIn = StringVar(self._screen)
         self.__varLangOut = StringVar(self._screen)
         # Frame
-        frameTop = self._arrtk.createFrame(self._screen)
-        frameTrad = self._arrtk.createFrame(self._screen)
+        frameTop = aFrame(self._screen)
+        frameTrad = aFrame(self._screen)
         # Config Fenetre
         self._screen.grid_columnconfigure(0, weight=1)
         self._screen.grid_rowconfigure(0, weight=0, minsize=60)  # hauteur fixe/mini pour le bandeau haut
@@ -29,23 +29,16 @@ class GuiTraducteur(GuiBase):
         frameTrad.grid_rowconfigure(1, weight=1)
         frameTrad.grid_rowconfigure(2, weight=0)
         # Widgets
-        labelTitle = self._arrtk.createLabel(frameTop,text=self._gestionnaire.getName()+" : Traducteur",
-                                             ppolice="Arial",ptaille=30,pstyle="bold")
-        self.__textBoxIn = self._arrtk.createTextBox(frameTrad,enableKeyboard=True,
-                                                     ppolice="Arial",ptaille=25)
-        self.__textBoxOut = self._arrtk.createTextBox(frameTrad,enableKeyboard=True,
-                                                      ppolice="Arial",ptaille=25)
-        btnTrad = self._arrtk.createButton(frameTrad,text="Traduire",ppolice="Arial",
-                                           ptaille=25,pstyle="bold",bg=self._btnColor,
-                                           fg=self._btnTexteColor,command=self.__translate)
-        labelIndicationIn = self._arrtk.createLabel(frameTrad,text="Langue d'entrée :",
-                                                    ppolice="Arial",ptaille=20,pstyle="bold")
-        labelIndicationOut = self._arrtk.createLabel(frameTrad,text="Langue de sortie :",
-                                                     ppolice="Arial",ptaille=20,pstyle="bold")
-        menuLangIn = self._arrtk.createOptionMenu(frameTrad,var=self.__varLangIn,value=self.__listLang
-                                                  ,taille=20,police="Arial")
-        menuLangOut = self._arrtk.createOptionMenu(frameTrad,var=self.__varLangOut,value=self.__listLang
-                                                        ,taille=20,police="Arial")
+        labelTitle = aLabel(frameTop,text=self._gestionnaire.getName()+" : Traducteur",
+                            police_size=30)
+        self.__textBoxIn = aText(frameTrad)
+        self.__textBoxOut = aText(frameTrad)
+
+        btnTrad = aButton(frameTrad,text="Traduire",command=self.__translate,size=20)
+        self.__menuLangIn = aOptionMenuLengend(frameTrad,text="Langue d'entrée ",
+                                               values=self.__listLang,gridUsed=True)
+        self.__menuLangOut = aOptionMenuLengend(frameTrad,text="Langue de sortie ",
+                                                values=self.__listLang,gridUsed=True)
 
         # Placement
         frameTop.grid(row=0, column=0, sticky="ew")
@@ -53,11 +46,8 @@ class GuiTraducteur(GuiBase):
 
         labelTitle.pack(side="left", anchor="nw", padx=10, pady=5)
 
-        labelIndicationIn.grid(row=0, column=0, sticky="w", padx=(10,5), pady=(10,5))
-        menuLangIn.grid(row=0, column=1, sticky="w", padx=(0,10), pady=(10,5))
-
-        labelIndicationOut.grid(row=0, column=2, sticky="e", padx=(10,5), pady=(10,5))
-        menuLangOut.grid(row=0, column=3, sticky="e", padx=(0,10), pady=(10,5))
+        self.__menuLangIn.grid(row=0, column=0, columnspan=2, sticky="ew", padx=(10, 5), pady=(10, 5))
+        self.__menuLangOut.grid(row=0, column=2, columnspan=2, sticky="ew", padx=(10, 5), pady=(10, 5))
 
         self.__textBoxIn.grid(row=1, column=0, columnspan=2, sticky="nsew", padx=(10,5), pady=(0,10))
         self.__textBoxOut.grid(row=1, column=2, columnspan=2, sticky="nsew", padx=(5,10), pady=(0,10))
@@ -69,12 +59,12 @@ class GuiTraducteur(GuiBase):
     def __clear(self):
         self.__textBoxIn.delete("1.0","end")
         self.__textBoxOut.delete("1.0","end")
-        self.__varLangIn.set("Langue d'entrée")
-        self.__varLangOut.set("Langue de sortie")
+        self.__menuLangIn.set_text("Langue d'entrée")
+        self.__menuLangOut.set_text("Langue de sortie")
 
     def __translate(self):
-        langIn = self.__varLangIn.get()
-        langOut = self.__varLangOut.get()
+        langIn = self.__menuLangIn.getValue()
+        langOut = self.__menuLangOut.getValue()
         texte = self.__textBoxIn.get("1.0","end").strip()
         self.__textBoxIn.delete("1.0","end")
 

@@ -1,6 +1,6 @@
 from gestionnaire.gestion import gestionnaire,confNeuron
 from gestionnaire.gestUserSetting import gestionnaire
-from lib.arrera_tk import *
+from librairy.arrera_tk import *
 
 def create_conf():
     conf = confNeuron(name="Opale",

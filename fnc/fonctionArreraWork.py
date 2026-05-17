@@ -39,6 +39,7 @@ class fncArreraWork(fncBase):
         self.__fncTaskProjet = None  # Correspont au tache du projet
         self.__listTaskProjetToday = []
         self.__listTaskProjetTowmorow = []
+        self.__listTaskProjet = []
         self.__listReadTableur = []
         self.__contentWork = ""
 
@@ -564,6 +565,16 @@ class fncArreraWork(fncBase):
 
     def getListTacheTowmorowProjet(self):
         return self.__listTaskProjetTowmorow
+
+    def setListTacheNoFinishProjet(self):
+        if self.__projectOpen:
+            self.__listTaskProjet = self.__fncTaskProjet.getNoFinishTask()
+            return True
+        else:
+            return False
+
+    def getListTacheNoFinishProjet(self):
+        return self.__listTaskProjet
 
     # Getteur
 

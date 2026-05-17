@@ -50,6 +50,13 @@
     "ouvre le projects",
     "ouvre le projects nommer",
     "ouvre le projects nomme"],
+  "list-word-open-project": [
+    "ouvre", "le", "projet",
+    "nommer",
+    "nomme",
+    "projets",
+    "project",
+    "projects"],
   "create-project": [
     "cree un projet nommer",
     "cree un projet nomme",
