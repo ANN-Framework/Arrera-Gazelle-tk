@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "arrera-gazelle"
+version = "4.0.0"
+description = "Interface graphique Tkinter des paramètres pour les assistants Arrera (compatible ANN v4)"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "ann-tkinter @ git+https://github.com/ANN-Framework/Arrera-Neuron-Network-tkinter.git@master",
+    "arrera-tk>=3.0.0",
+    "customtkinter",
+    "pillow"
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["arrera_gazelle*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.json", "*.png"]
