@@ -1,9 +1,8 @@
 import webbrowser
-
-from librairy.arrera_tk import *
-from tkinter import messagebox
+from tkinter import messagebox, filedialog, END
 from typing import Union
 import threading as th
+from arrera_tk import *
 from librairy.travailJSON import jsonWork
 from gestionnaire.gestion import gestionnaire
 
@@ -726,8 +725,10 @@ class arrera_gazelle :
         self.__windows.update()
 
     def __addWorkFolder(self):
-        if self.__gestUser.setWorkFolder():
-            messagebox.showinfo("Paramètres","Le dossier de travail a bien été enregistré")
+        folder = filedialog.askdirectory(title="Sélectionner le dossier de travail Arrera Work")
+        if folder:
+            if self.__gestUser.setWorkFolder(folder):
+                messagebox.showinfo("Paramètres", "Le dossier de travail a bien été enregistré")
 
         self.__viewMainSetting()
 
@@ -755,8 +756,10 @@ class arrera_gazelle :
         self.__windows.update()
 
     def __addDownloadFolder(self):
-        if self.__gestUser.setVideoDownloadFolder():
-            messagebox.showinfo("Paramètres","Le dossier de téléchargement a bien été enregistré")
+        folder = filedialog.askdirectory(title="Sélectionner le dossier de téléchargement")
+        if folder:
+            if self.__gestUser.setVideoDownloadFolder(folder):
+                messagebox.showinfo("Paramètres", "Le dossier de téléchargement a bien été enregistré")
 
         self.__viewMainSetting()
 
@@ -1067,11 +1070,16 @@ class arrera_gazelle :
     def __addSoft(self):
         soft = self.__eAddSoft.getEntry().get()
         if soft == "":
-            messagebox.showerror("Erreur","Le nom du logiciel ne peut pas être vide")
+            messagebox.showerror("Erreur", "Le nom du logiciel ne peut pas être vide")
             return
-        else :
-            if self.__gestUser.setSoft(soft):
-                messagebox.showinfo("Paramètres","Le logiciel a bien été ajouté")
+        else:
+            path = filedialog.askopenfilename(
+                title=f"Sélectionner le programme pour {soft}",
+                filetypes=[("Exécutables / Applications", "*.*")]
+            )
+            if path:
+                if self.__gestUser.setSoft(soft, path):
+                    messagebox.showinfo("Paramètres", "Le logiciel a bien été ajouté")
             self.__eAddSoft.getEntry().delete(0, END)
             self.__viewSoftAcceuil()
 
