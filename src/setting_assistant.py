@@ -31,7 +31,7 @@ def create_conf():
     return gestionnaire(conf)
 
 def launch_setting():
-    from setting_gui.arrera_gazelle import arrera_gazelle
+    from arrera_gazelle.arrera_gazelle import arrera_gazelle
     windows = aTk(theme_file="asset/theme/theme_bleu_blanc.json")
     gui = arrera_gazelle(windows, create_conf(), "json_conf/conf-setting.json")
     windows.maxsize(500,400)
