@@ -40,8 +40,9 @@ The initialization of the `arrera_gazelle` object is done by passing several ess
 Here is a typical initialization example (based on `src/setting_assistant.py`):
 
 ```python
-from setting_gui.arrera_gazelle import arrera_gazelle
+from arrera_gazelle.arrera_gazelle import arrera_gazelle
 from lib.arrera_tk import aTk
+
 # ... import your manager ...
 
 # Creation of the main window
@@ -54,14 +55,14 @@ windows = aTk(theme_file="asset/theme/theme_bleu_blanc.json")
 gui = arrera_gazelle(windows, create_conf(), "json_conf/conf-setting.json")
 
 # Window size configuration
-windows.maxsize(500,400)
-windows.minsize(500,400)
+windows.maxsize(500, 400)
+windows.minsize(500, 400)
 
 # Definition of custom actions
 # Action for the main "Back" button (here, close the window)
-gui.passFNCQuit(lambda : windows.destroy())
+gui.passFNCQuit(lambda: windows.destroy())
 # Action for clicking on the assistant icon
-gui.passFNCBTNIcon(lambda : print("Icon"))
+gui.passFNCBTNIcon(lambda: print("Icon"))
 
 # Activation of the interface (display)
 gui.active()

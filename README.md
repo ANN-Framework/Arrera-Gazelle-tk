@@ -42,8 +42,9 @@ L'initialisation de l'objet `arrera_gazelle` se fait en passant plusieurs param�
 Voici un exemple d'initialisation typique (basé sur `src/setting_assistant.py`) :
 
 ```python
-from setting_gui.arrera_gazelle import arrera_gazelle
+from arrera_gazelle.arrera_gazelle import arrera_gazelle
 from lib.arrera_tk import aTk
+
 # ... import de votre gestionnaire ...
 
 # Création de la fenêtre principale
@@ -56,14 +57,14 @@ windows = aTk(theme_file="asset/theme/theme_bleu_blanc.json")
 gui = arrera_gazelle(windows, create_conf(), "json_conf/conf-setting.json")
 
 # Configuration de la taille de la fenêtre
-windows.maxsize(500,400)
-windows.minsize(500,400)
+windows.maxsize(500, 400)
+windows.minsize(500, 400)
 
 # Définition des actions personnalisées
 # Action pour le bouton "Retour" principal (ici, fermer la fenêtre)
-gui.passFNCQuit(lambda : windows.destroy())
+gui.passFNCQuit(lambda: windows.destroy())
 # Action pour le clic sur l'icône de l'assistant
-gui.passFNCBTNIcon(lambda : print("Icon"))
+gui.passFNCBTNIcon(lambda: print("Icon"))
 
 # Activation de l'interface (affichage)
 gui.active()
